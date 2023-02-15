@@ -1,11 +1,7 @@
 const customizer = {
     name: 'customizer',
     options: [
-        {name: 'Material 1', src: 'images/material/1.jpg', thumb_src: 'images/material_thumb/1_32x32.jpg'},
-        {name: 'Material 2', src: 'images/material/2.jpg', thumb_src: 'images/material_thumb/2_32x32.jpg'},
-        {name: 'Material 3', src: 'images/material/3.jpg', thumb_src: 'images/material_thumb/3_32x32.jpg'},
-        {name: 'Material 4', src: 'images/material/4.jpg', thumb_src: 'images/material_thumb/4_32x32.jpg'},
-        {name: 'Material 5', src: 'images/material/5.jpg', thumb_src: 'images/material_thumb/5_32x32.jpg'}
+        {name: 'Material 1', src: '././assets/images/image.jpg', thumb_src: '././assets/images/image_32x32.jpg'},
     ],
     default_src: '',
     position: '',

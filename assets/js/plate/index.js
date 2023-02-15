@@ -22,8 +22,14 @@ const plate = {
         
         setTimeout(() => {
             $(`${this.selector} canvas`).cropper({
-                viewMode: 2,
-                dragMode: 'none',
+                autoCropArea: 1,
+                viewMode: 1,
+                dragMode: 'crop',
+                responsive: true,
+                background: false,
+                zoomable: false,
+                guides: false,
+
                 crop: (event) => {
                     console.log(event.detail.x);
                     console.log(event.detail.y);
@@ -33,7 +39,7 @@ const plate = {
             });
 
             //$(`${this.selector} canvas`).cropper('rotate', 90);
-        }, 90);
+        }, 175);
     },
 };
 
