@@ -21,7 +21,7 @@ jQuery(document).ready(($) => {
     init(objects_arr);
 
     // Script Start
-    plate.setImageCanvas('./assets/images/test-image.png');
+    plate.setImageCanvas('./assets/images/image.jpg');
 
 
     // Plate Events
