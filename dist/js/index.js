@@ -14,8 +14,9 @@ jQuery(document).ready(($) => {
         id; // int
         selector; // str
         cropperSelector; // str
+        panelSelector;
         canvas;
-        image = './assets/images/image.jpg'; // default image
+        image; // default image
         
         constructor(id) {
             this.id = id;
@@ -28,20 +29,19 @@ jQuery(document).ready(($) => {
             </div>`;
     
             $('.plate_col').append(html);
-    
-            this.init();
         }
     
         init() {
             this.selector = `#plate_id_${this.id}`;
             this.cropperSelector = `${this.selector} canvas`;
+            this.panelSelector = `plate-panel_id_${this.id}`;
             this.canvas = document.querySelector(this.cropperSelector);
     
             // Image Init
             this.setImageCanvas(this.image);
     
             // Cropper Init
-            setTimeout(() => this.initCropper(), 150);
+            setTimeout(() => this.initCropper(), 225);
     
             // Settings Panel Init
             this.initSettingsPanel();
@@ -59,6 +59,10 @@ jQuery(document).ready(($) => {
     
             $( `${this.selector} .plate__scale` ).on('click', (e) => {
                 this.setCropperScaleX();
+            });
+    
+            $( `#${this.panelSelector} .plate-panel__remove` ).on('click', (e) => {
+                $('.plate-panels').trigger('removePlate', this.id);
             });
     
               /*let plate_html = document.querySelector(".plate .cropper-container");
@@ -86,12 +90,14 @@ jQuery(document).ready(($) => {
         }
     
         initSettingsPanel() {
-            const html = `<div class="plate-panel" id="plate-panel_id_${this.id}">
+            const html = `<div class="plate-panel" id="${this.panelSelector}">
                 <label for="plate-panel_id_${this.id}_width">Breite</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_width" id="plate-panel_id_${this.id}_width" min="10" max="300">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300">
     
                 <label for="plate-panel_id_${this.id}_height">Höhe</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_height" id="plate-panel_id_${this.id}_height" min="10" max="150">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150">
+    
+                <a href="#" class="button plate-panel__remove">X</a>
             </div>`;
     
             $('.plate-panels').append(html);
@@ -113,6 +119,10 @@ jQuery(document).ready(($) => {
             image.src = src;
         }
     
+        setCropperImage(img) {
+            $(this.cropperSelector).cropper('replace', this.image, true);
+        }
+    
         setCropperWidth() {
     
         }
@@ -127,10 +137,16 @@ jQuery(document).ready(($) => {
                   
             $(this.cropperSelector).cropper('scaleX', plate_scale);
         }
+    
+        destroy() {
+            $(this.selector).remove();
+            $(`#${this.panelSelector}`).remove();
+        }
     }
     class Panel {
         selector; // str
         plates = []; // array
+        image = './assets/images/image_2.jpg'; // default image
     
         constructor() {
     
@@ -153,11 +169,20 @@ jQuery(document).ready(($) => {
     
         addPlate(plate) {
             //this.plates = [...this.plates, plate];
+            plate.image = this.image;
+            plate.init();
+            
             this.plates.push(plate);
         }
     
         removePlate(plateIndex) {
-            delete this.plates[plateIndex];
+            console.log(this.plates);
+            const plateId = this.plates.findIndex(x => x.id == plateIndex);
+            
+            this.plates[plateId].destroy();
+            this.plates.splice(plateId, 1);
+    
+            console.log(this.plates);
         }
     }
     // Class Customizer
@@ -189,9 +214,28 @@ jQuery(document).ready(($) => {
     // Add plate object
     panel.addPlate(new Plate(1));
 
+
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {
-      let plate_new_id = $('.plate').length + 1;
+      let plate_new_id = $('.plate:last').attr('id');
+      plate_new_id = Number(plate_new_id.split('_')[2]) + 1;
+
       panel.addPlate(new Plate(plate_new_id));
+    });
+
+    // Remove plate event
+    $( '.plate-panels' ).on('removePlate', function(e, id) {
+      console.log(id);
+      panel.removePlate(id);
+    });
+
+    // Replace Image Event
+    $( '.panel-replace' ).on('click', function(e) {
+      panel.image = './assets/images/image.jpg';
+      
+      panel.plates.forEach((item) => {
+        item.image = panel.image;
+        item.setCropperImage();
+      });
     });
 });

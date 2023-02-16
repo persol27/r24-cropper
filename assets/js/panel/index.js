@@ -1,6 +1,7 @@
 class Panel {
     selector; // str
     plates = []; // array
+    image = './assets/images/image_2.jpg'; // default image
 
     constructor() {
 
@@ -23,10 +24,19 @@ class Panel {
 
     addPlate(plate) {
         //this.plates = [...this.plates, plate];
+        plate.image = this.image;
+        plate.init();
+        
         this.plates.push(plate);
     }
 
     removePlate(plateIndex) {
-        delete this.plates[plateIndex];
+        console.log(this.plates);
+        const plateId = this.plates.findIndex(x => x.id == plateIndex);
+        
+        this.plates[plateId].destroy();
+        this.plates.splice(plateId, 1);
+
+        console.log(this.plates);
     }
 }

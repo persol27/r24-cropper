@@ -21,9 +21,28 @@ jQuery(document).ready(($) => {
     // Add plate object
     panel.addPlate(new Plate(1));
 
+
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {
-      let plate_new_id = $('.plate').length + 1;
+      let plate_new_id = $('.plate:last').attr('id');
+      plate_new_id = Number(plate_new_id.split('_')[2]) + 1;
+
       panel.addPlate(new Plate(plate_new_id));
+    });
+
+    // Remove plate event
+    $( '.plate-panels' ).on('removePlate', function(e, id) {
+      console.log(id);
+      panel.removePlate(id);
+    });
+
+    // Replace Image Event
+    $( '.panel-replace' ).on('click', function(e) {
+      panel.image = './assets/images/image.jpg';
+      
+      panel.plates.forEach((item) => {
+        item.image = panel.image;
+        item.setCropperImage();
+      });
     });
 });

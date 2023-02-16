@@ -2,8 +2,9 @@ class Plate {
     id; // int
     selector; // str
     cropperSelector; // str
+    panelSelector;
     canvas;
-    image = './assets/images/image.jpg'; // default image
+    image; // default image
     
     constructor(id) {
         this.id = id;
@@ -16,20 +17,19 @@ class Plate {
         </div>`;
 
         $('.plate_col').append(html);
-
-        this.init();
     }
 
     init() {
         this.selector = `#plate_id_${this.id}`;
         this.cropperSelector = `${this.selector} canvas`;
+        this.panelSelector = `plate-panel_id_${this.id}`;
         this.canvas = document.querySelector(this.cropperSelector);
 
         // Image Init
         this.setImageCanvas(this.image);
 
         // Cropper Init
-        setTimeout(() => this.initCropper(), 150);
+        setTimeout(() => this.initCropper(), 225);
 
         // Settings Panel Init
         this.initSettingsPanel();
@@ -47,6 +47,10 @@ class Plate {
 
         $( `${this.selector} .plate__scale` ).on('click', (e) => {
             this.setCropperScaleX();
+        });
+
+        $( `#${this.panelSelector} .plate-panel__remove` ).on('click', (e) => {
+            $('.plate-panels').trigger('removePlate', this.id);
         });
 
           /*let plate_html = document.querySelector(".plate .cropper-container");
@@ -74,12 +78,14 @@ class Plate {
     }
 
     initSettingsPanel() {
-        const html = `<div class="plate-panel" id="plate-panel_id_${this.id}">
+        const html = `<div class="plate-panel" id="${this.panelSelector}">
             <label for="plate-panel_id_${this.id}_width">Breite</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_width" id="plate-panel_id_${this.id}_width" min="10" max="300">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300">
 
             <label for="plate-panel_id_${this.id}_height">Höhe</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_height" id="plate-panel_id_${this.id}_height" min="10" max="150">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150">
+
+            <a href="#" class="button plate-panel__remove">X</a>
         </div>`;
 
         $('.plate-panels').append(html);
@@ -101,6 +107,10 @@ class Plate {
         image.src = src;
     }
 
+    setCropperImage(img) {
+        $(this.cropperSelector).cropper('replace', this.image, true);
+    }
+
     setCropperWidth() {
 
     }
@@ -114,5 +124,10 @@ class Plate {
               plate_scale = plate_data.scaleX == -1 ? 1 : -1;
               
         $(this.cropperSelector).cropper('scaleX', plate_scale);
+    }
+
+    destroy() {
+        $(this.selector).remove();
+        $(`#${this.panelSelector}`).remove();
     }
 }

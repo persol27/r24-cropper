@@ -63,3 +63,10 @@ body {
         margin: 15px auto 0;
     }
 }
+
+.plate-panels {
+
+    .plate-panel:nth-child(1) .plate-panel__remove {
+        display: none;
+    }
+}
