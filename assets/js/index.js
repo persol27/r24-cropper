@@ -9,6 +9,12 @@ window.addEventListener('load', () => {
   }
 });
 
+function roundFloat(num) {
+    const round_result = Math.floor(num * 100) / 100;
+    
+    return round_result;
+}
+
 jQuery(document).ready(($) => {
     //=include plate/index.js
     //=include panel/index.js
@@ -32,7 +38,6 @@ jQuery(document).ready(($) => {
 
     // Remove plate event
     $( '.plate-panels' ).on('removePlate', function(e, id) {
-      console.log(id);
       panel.removePlate(id);
     });
 

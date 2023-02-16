@@ -62,14 +62,42 @@ class Plate {
         $(this.cropperSelector).cropper({
             autoCropArea: 1,
             viewMode: 1,
-            dragMode: 'crop',
+            dragMode: 'none',
             responsive: true,
             background: false,
             zoomable: false,
             guides: false,
 
             ready: (event) => {
-                //Fix container size
+                this.getCoordsPrecent();
+
+                // Fix cropper when resize
+                if (typeof this.coords_obj != "undefined") {
+                    if (typeof this.coords_obj.coord_left_precents != "undefined" || typeof this.coords_obj.coord_top_precents != "undefined") {
+
+                        let new_crop_data;
+
+                        //Get coords from precent 
+                        let cropImageDataObj = $(this.cropperSelector).cropper('getCanvasData', new_crop_data),
+                            image_width = roundFloat(cropImageDataObj.width),
+                            image_height = roundFloat(cropImageDataObj.height),
+                            image_width_precent = image_width/100,
+                            image_height_precent = image_height/100,
+                            coord_left_precents = this.coords_obj.coord_left_precents,
+                            coord_top_precents = this.coords_obj.coord_top_precents,
+                            coord_left = coord_left_precents * image_width_precent,
+                            coord_top = coord_top_precents * image_height_precent;
+
+                        //Set new croppers coords
+                        new_crop_data = {
+                            "left": coord_left,
+                            "top": coord_top,
+                        };
+
+                        $(this.cropperSelector).cropper('setCropBoxData', new_crop_data);
+                    }
+                }
+                // Fix container size
                 let imageData = $(this.cropperSelector).cropper('getImageData'),
                     imageHeightString = imageData.height+"px",
                     canvasTransform = $(`${this.selector} .cropper-container .cropper-wrap-box .cropper-canvas`).css("transform");
@@ -88,10 +116,10 @@ class Plate {
     initSettingsPanel() {
         const html = `<div class="plate-panel" id="${this.panelSelector}">
             <label for="plate-panel_id_${this.id}_width">Breite</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300" value="20">
 
             <label for="plate-panel_id_${this.id}_height">Höhe</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150" value="10">
 
             <a href="#" class="button plate-panel__remove">X</a>
         </div>`;
@@ -102,9 +130,108 @@ class Plate {
     }
 
     initSettingsPanelEvents() {
-        $(`#${this.panelSelector}`).on('input propertychange', function() {
-            
+        // Input Width & Height
+        $(`#${this.panelSelector} input`).on('input propertychange', () => {
+            this.setCropperSizes();
         });
+    }
+
+    getCoordsPrecent() {
+        //Get cropped image coordinates & image data
+        let cropImageDataObj = $(this.cropperSelector).cropper('getCanvasData');
+
+        let coord_left_canvas = cropImageDataObj.left,
+            coord_top_canvas = cropImageDataObj.top;
+
+        let image_width = roundFloat(cropImageDataObj.width),
+            image_height = roundFloat(cropImageDataObj.height);
+
+        let image_width_precent = image_width / 100,
+            image_height_precent = image_height / 100;
+        
+        let cropBoxDataObj = $(this.cropperSelector).cropper('getCropBoxData'),
+            coord_left_crop = cropBoxDataObj.left,
+            coord_left;
+
+        if (coord_left_crop < 1) {
+            coord_left = 0;
+        } else {
+            if (coord_left_canvas > 0) {
+                coord_left = coord_left_crop - coord_left_canvas;
+            } else {
+                coord_left = coord_left_crop;
+            }
+
+            coord_left = roundFloat(coord_left);
+        }
+
+        if (coord_left < 1) {
+            coord_left = 0;
+        }
+
+        let coord_left_precents = coord_left / image_width_precent;
+        coord_left_precents = roundFloat(coord_left_precents);
+
+
+        let coord_top_crop = cropBoxDataObj.top,
+            coord_top;
+
+        if (coord_top_crop < 1) {
+            coord_top = 0;
+        } else {
+            if (coord_top_canvas > 0) {
+                coord_top = coord_top_crop - coord_top_canvas;
+            } else{
+                coord_top = coord_top_crop;
+            }
+
+            coord_top = roundFloat(coord_top);
+        }
+
+        if (coord_top < 1) {
+            coord_top = 0;
+        }
+
+        let coord_top_precents = coord_top / image_height_precent;
+        coord_top_precents = roundFloat(coord_top_precents);
+
+        let coord_width = roundFloat(cropBoxDataObj.width),
+            coord_width_precents = coord_width/image_width_precent;
+
+        coord_width_precents = roundFloat(coord_width_precents);
+        let coord_width_half = coord_width / 2;
+
+        let coord_height = roundFloat(cropBoxDataObj.height),
+            coord_height_precents = coord_height / image_height_precent;
+
+        coord_height_precents = roundFloat(coord_height_precents);
+        let coord_height_half = coord_height / 2;
+
+        // Count center
+        let center_x = coord_left + coord_width_half;
+        center_x = roundFloat(center_x);
+
+        let center_x_precents = center_x / image_width_precent;
+        center_x_precents = roundFloat(center_x_precents);
+
+        let center_y = coord_top + coord_height_half;
+        center_y = roundFloat(center_y);
+
+        let center_y_precents = center_y / image_height_precent;
+        center_y_precents = roundFloat(center_y_precents);
+
+        
+        //Get cropped image coordinates END
+        this.coords_obj = {
+          "coord_left_precents": coord_left_precents,
+          "coord_top_precents": coord_top_precents,
+          "center_x_precents": center_x_precents,
+          "center_y_precents": center_y_precents,
+          "coord_width_precents": coord_width_precents,
+          "coord_height_precents": coord_height_precents
+        };
+
+        return this.coords_obj;
     }
 
     setId(id) {
@@ -127,12 +254,10 @@ class Plate {
         $(this.cropperSelector).cropper('replace', this.image, true);
     }
 
-    setCropperWidth() {
+    setCropperSizes() {
+        let aspect_ratio = $(`#${this.panelSelector} .width`).val() / $(`#${this.panelSelector} .height`).val();
 
-    }
-
-    setCropperHeight() {
-
+        $(this.cropperSelector).cropper('setAspectRatio', aspect_ratio);
     }
 
     setCropperScaleX() {
