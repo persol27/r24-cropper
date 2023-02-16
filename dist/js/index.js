@@ -10,142 +10,188 @@ window.addEventListener('load', () => {
 });
 
 jQuery(document).ready(($) => {
-    const plate = {
-        name: 'plate',
-        id: 1,
-        selector: '',
-        canvas: '',
-        crop: {}, // obj
-        setImageCanvas: (src) => {
-            const ctx = plate.canvas.getContext("2d");
-            
-            const image = new Image(337, 295);
-            image.onload = drawImageActualSize;
-            image.src = src;
+    class Plate {
+        id; // int
+        selector; // str
+        cropperSelector; // str
+        canvas;
+        image = './assets/images/image.jpg'; // default image
+        
+        constructor(id) {
+            this.id = id;
     
-            function drawImageActualSize() {
-                ctx.drawImage(this, 0, 0);
-            };
-        },
+            const html = `<div class="plate" id="plate_id_${this.id}">
+                <canvas class="plate__canvas"></canvas>
+                <div class="plate__overlay"></div>
+                <span class="plate__crop"></span>
+                <a href="#" class="button plate__scale">Spiegeln</a>
+            </div>`;
     
-        init() {
-            this.selector = `#${this.name}_id_${this.id}`;
-            this.canvas = document.querySelector(`${this.selector} canvas`);
-            
-            setTimeout(() => {
-                $(`${this.selector} canvas`).cropper({
-                    autoCropArea: 1,
-                    viewMode: 1,
-                    dragMode: 'crop',
-                    responsive: true,
-                    background: false,
-                    zoomable: false,
-                    guides: false,
+            $('.plate_col').append(html);
     
-                    crop: (event) => {
-                        console.log(event.detail.x);
-                        console.log(event.detail.y);
-                        console.log(event.detail.width);
-                        console.log(event.detail.height);
-                    }
-                });
-    
-                //$(`${this.selector} canvas`).cropper('rotate', 90);
-            }, 175);
-        },
-    };
-    
-    // method rotateCanvas --> this.canvas.scale(1, -1)
-    const panel = {
-        name: 'panel',
-        selector: '',
-        customizer: {},
-        plateArray: [], //array
+            this.init();
+        }
     
         init() {
-            
-        },
-    };
-    const customizer = {
-        name: 'customizer',
-        options: [
-            {name: 'Material 1', src: '././assets/images/image.jpg', thumb_src: '././assets/images/image_32x32.jpg'},
-        ],
-        default_src: '',
-        position: '',
-        selector: '.material-select',
+            this.selector = `#plate_id_${this.id}`;
+            this.cropperSelector = `${this.selector} canvas`;
+            this.canvas = document.querySelector(this.cropperSelector);
     
-        templateSelect(state) {
-              if (!state.id) {
-                return state.text;
-              }
+            // Image Init
+            this.setImageCanvas(this.image);
     
-              var $state = $(
-                '<img src="' + state.element.getAttribute('data-thumb') + '" class="img-thumb" > <span>' + state.text + '</span>'
-              );
-              return $state;
-        },
-        eventsSelect() {
-        },
-        init() {
-            this.default_src = this.options[0].src;
-            /*this.position = position.coords;
+            // Cropper Init
+            setTimeout(() => this.initCropper(), 150);
     
-            for (let $i = 0; $i < this.options.length; $i++) {
-                let class_list = 'material-select__item material-option';
-                $( this.selector )
-                    .append(`<option class="${class_list}" value="${this.options[$i].src}" data-thumb="${this.options[$i].thumb_src}">${this.options[$i].name}</option>`);
-            }
+            // Settings Panel Init
+            this.initSettingsPanel();
     
-            $( this.selector ).select2({
-                selectionCssClass: 'select2-menu',
-                dropdownCssClass: 'select2-menu-dropdown',
-                width: 250,
-                minimumResultsForSearch: Infinity,
-                templateResult: this.templateSelect,
-                templateSelection: this.templateSelect
+            // Events Init
+            this.initEvents();
+        }
+    
+        initEvents() {
+            $(this.selector).on('mouseover', function() {
+                $(this).find('.cropper-center').hide();
+            }).on('mouseleave', function() {
+                $(this).find('.cropper-center').show();
             });
     
-            this.eventsSelect(); // Select2 events init*/
+            $( `${this.selector} .plate__scale` ).on('click', (e) => {
+                this.setCropperScaleX();
+            });
+    
+              /*let plate_html = document.querySelector(".plate .cropper-container");
+              plate_html.addEventListener("touchstart", (e) => $( document ).find('.cropper-center').hide(), false);
+              plate_html.addEventListener("touchend",   (e) => $( document ).find('.cropper-center').show(), false);*/
         }
-    };
+    
+        initCropper() {
+            $(this.cropperSelector).cropper({
+                autoCropArea: 1,
+                viewMode: 1,
+                dragMode: 'crop',
+                responsive: true,
+                background: false,
+                zoomable: false,
+                guides: false,
+    
+                crop: (event) => {
+                    console.log(event.detail.x);
+                    console.log(event.detail.y);
+                    console.log(event.detail.width);
+                    console.log(event.detail.height);
+                }
+            });
+        }
+    
+        initSettingsPanel() {
+            const html = `<div class="plate-panel" id="plate-panel_id_${this.id}">
+                <label for="plate-panel_id_${this.id}_width">Breite</label>
+                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_width" id="plate-panel_id_${this.id}_width" min="10" max="300">
+    
+                <label for="plate-panel_id_${this.id}_height">Höhe</label>
+                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="plate-panel_id_${this.id}_height" id="plate-panel_id_${this.id}_height" min="10" max="150">
+            </div>`;
+    
+            $('.plate-panels').append(html);
+        }
+    
+        setId(id) {
+            this.id = id;
+        }
+    
+        setImageCanvas(src) {
+            const ctx = this.canvas.getContext("2d");
+            
+            const image = new Image(337, 295);
+    
+            image.onload = function() {
+                ctx.drawImage(this, 0, 0);
+            };
+    
+            image.src = src;
+        }
+    
+        setCropperWidth() {
+    
+        }
+    
+        setCropperHeight() {
+    
+        }
+    
+        setCropperScaleX() {
+            const plate_data = $(this.cropperSelector).cropper('getData'),
+                  plate_scale = plate_data.scaleX == -1 ? 1 : -1;
+                  
+            $(this.cropperSelector).cropper('scaleX', plate_scale);
+        }
+    }
+    class Panel {
+        selector; // str
+        plates = []; // array
+    
+        constructor() {
+    
+            this.init();
+        }
+    
+        init() {
+    
+            // Events Init
+            this.initEvents();
+        }
+    
+        initEvents() {
+    
+            //
+            /*let plate_html = document.querySelector(".plate .cropper-container");
+            plate_html.addEventListener("touchstart", (e) => $( document ).find('.cropper-center').hide(), false);
+            plate_html.addEventListener("touchend",   (e) => $( document ).find('.cropper-center').show(), false);*/
+        }
+    
+        addPlate(plate) {
+            //this.plates = [...this.plates, plate];
+            this.plates.push(plate);
+        }
+    
+        removePlate(plateIndex) {
+            delete this.plates[plateIndex];
+        }
+    }
+    // Class Customizer
+    class Customizer {
+        constructor() {
+    
+            this.init();
+        }
+    
+        init() {
+    
+            // Events Init
+            this.initEvents();
+        }
+    
+        initEvents() {
+    
+        }
+    
+        addPlateSettings() {
+            
+        }
+    }
+    
 
-    // Script Init
-    let objects_arr = [panel, plate, customizer,];
-    const init = objects => objects.forEach((el) => el.init());
+    // Panel Class Init
+    const panel = new Panel();
+    
+    // Add plate object
+    panel.addPlate(new Plate(1));
 
-    init(objects_arr);
-
-    // Script Start
-    plate.setImageCanvas('./assets/images/image.jpg');
-
-
-    // Plate Events
-    $( '.plate .plate__scale' ).on('click', function (e) {
-      const plate_id = $(this).parent('.plate').attr('id'),
-            plate_data = $(`.plate canvas`).cropper('getData'),
-            plate_scale = plate_data.scaleX == -1 ? 1 : -1;
-      
-      $(`#${plate_id} canvas`).cropper('scaleX', plate_scale);
+    // Add new plate event
+    $( '.panel-add' ).on('click', function(e) {
+      let plate_new_id = $('.plate').length + 1;
+      panel.addPlate(new Plate(plate_new_id));
     });
-
-    $( '.panel-add' ).on('click', function (e) {
-      let plate_length = $('.plate').length + 1;
-      $('.plate').clone().attr('id', `plate_id_${plate_length}`).appendTo('.plate-col');
-    });
-
-    // Events
-    $( document ).on('mouseover', '.plate .cropper-container', () => {
-      $( document ).find('.cropper-center').hide();
-    }).on('mouseleave', '.plate .cropper-container', () => {
-      $( document ).find('.cropper-center').show();
-    });
-
-    /*let plate_html = document.querySelector(".plate .cropper-container");
-    plate_html.addEventListener("touchstart", (e) => $( document ).find('.cropper-center').hide(), false);
-    plate_html.addEventListener("touchend",   (e) => $( document ).find('.cropper-center').show(), false);*/
 });
-
-// obj Crop находится в obj Plate
-// obj Plate находится в array Plate_arr в obj Panel
-// obj Customizer находится в obj Panel

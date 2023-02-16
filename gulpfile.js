@@ -18,6 +18,8 @@ gulp.task('js', () => {
         .pipe(include())
         .on('error', console.log)
         .pipe(gulp.dest('dist/js'))
+        /*
         .pipe(minify())
         .pipe(gulp.dest('dist/js'))
+        */
 })
