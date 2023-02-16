@@ -68,6 +68,14 @@ class Plate {
             zoomable: false,
             guides: false,
 
+            ready: (event) => {
+                //Fix container size
+                let imageData = $(this.cropperSelector).cropper('getImageData'),
+                    imageHeightString = imageData.height+"px",
+                    canvasTransform = $(`${this.selector} .cropper-container .cropper-wrap-box .cropper-canvas`).css("transform");
+                $(`${this.selector} .cropper-container .cropper-drag-box`).css({"height":imageHeightString, "transform": canvasTransform });
+            },
+
             crop: (event) => {
                 console.log(event.detail.x);
                 console.log(event.detail.y);
@@ -80,15 +88,23 @@ class Plate {
     initSettingsPanel() {
         const html = `<div class="plate-panel" id="${this.panelSelector}">
             <label for="plate-panel_id_${this.id}_width">Breite</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300">
 
             <label for="plate-panel_id_${this.id}_height">Höhe</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150">
 
             <a href="#" class="button plate-panel__remove">X</a>
         </div>`;
 
         $('.plate-panels').append(html);
+
+        this.initSettingsPanelEvents();
+    }
+
+    initSettingsPanelEvents() {
+        $(`#${this.panelSelector}`).on('input propertychange', function() {
+            
+        });
     }
 
     setId(id) {
