@@ -66,6 +66,7 @@ class Plate {
             responsive: true,
             background: false,
             zoomable: false,
+            cropBoxResizable: false,
             guides: false,
 
             ready: (event) => {
