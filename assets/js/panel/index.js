@@ -44,7 +44,7 @@ class Panel {
         if (thisBackgroundCount !== newBackgroundCount) {
             while (thisBackgroundCount !== newBackgroundCount) {
                 if (thisBackgroundCount > newBackgroundCount) {
-                    $('.background__item').last().remove();
+                    this.backgroundRemoveLast();
                     thisBackgroundCount--;
                 } else {
                     this.backgroundCreate();
@@ -77,8 +77,8 @@ class Panel {
         });
     }
 
-    backgroundRemove() {
-
+    backgroundRemoveLast() {
+        $('.background__item').last().remove();
     }
 
     addPlate(plate) {

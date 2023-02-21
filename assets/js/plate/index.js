@@ -17,7 +17,6 @@ class Plate {
         const html = `<div class="plate" id="plate_id_${this.id}">
             <canvas class="plate__canvas"></canvas>
         </div>`;
-        // <a href="#" class="button plate__scale">Spiegeln</a>
 
         $('.plate-track').append(html);
     }
@@ -255,9 +254,17 @@ class Plate {
     }
 
     setCropperSizes() {
-        let aspect_ratio = $(`#${this.panelSelector} .width`).val() / $(`#${this.panelSelector} .height`).val();
+        //let aspect_ratio = $(`#${this.panelSelector} .width`).val() / $(`#${this.panelSelector} .height`).val();
+        //$(this.cropperSelector).cropper('setAspectRatio', aspect_ratio);
 
-        $(this.cropperSelector).cropper('setAspectRatio', aspect_ratio);
+        let plateData = $(this.cropperSelector).cropper('getData');
+        plateData.width = Number($(`#${this.panelSelector} .width`).val());
+        plateData.height = Number($(`#${this.panelSelector} .height`).val());
+
+        console.log(plateData);
+
+        $(this.cropperSelector).cropper('setData', plateData)
+        $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
     }
 
     setCropperScaleX() {
