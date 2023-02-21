@@ -9,24 +9,23 @@ class Plate {
     constructor(id) {
         this.id = id;
 
-        const html = `<div class="plate" id="plate_id_${this.id}">
-            <canvas class="plate__canvas"></canvas>
-            <div class="plate__overlay"></div>
-            <span class="plate__crop"></span>
-            <a href="#" class="button plate__scale">Spiegeln</a>
-        </div>`;
-
-        $('.plate_col').append(html);
-    }
-
-    init() {
         this.selector = `#plate_id_${this.id}`;
         this.cropperSelector = `${this.selector} canvas`;
         this.panelSelector = `plate-panel_id_${this.id}`;
         this.canvas = document.querySelector(this.cropperSelector);
 
+        const html = `<div class="plate" id="plate_id_${this.id}">
+            <canvas class="plate__canvas"></canvas>
+        </div>`;
+        // <a href="#" class="button plate__scale">Spiegeln</a>
+
+        $('.plate-track').append(html);
+    }
+
+    init() {
+
         // Image Init
-        this.setImageCanvas(this.image);
+        //this.setImageCanvas(this.image);
 
         // Cropper Init
         setTimeout(() => this.initCropper(), 225);
@@ -61,7 +60,7 @@ class Plate {
     initCropper() {
         $(this.cropperSelector).cropper({
             autoCropArea: 1,
-            viewMode: 1,
+            viewMode: 3,
             dragMode: 'none',
             responsive: true,
             background: false,
@@ -70,7 +69,7 @@ class Plate {
             guides: false,
 
             ready: (event) => {
-                this.getCoordsPrecent();
+                /*this.getCoordsPrecent();
 
                 // Fix cropper when resize
                 if (typeof this.coords_obj != "undefined") {
@@ -97,10 +96,11 @@ class Plate {
 
                         $(this.cropperSelector).cropper('setCropBoxData', new_crop_data);
                     }
-                }
+                }*/
+
                 // Fix container size
                 let imageData = $(this.cropperSelector).cropper('getImageData'),
-                    imageHeightString = imageData.height+"px",
+                    imageHeightString = $(this.selector).height() + "px",
                     canvasTransform = $(`${this.selector} .cropper-container .cropper-wrap-box .cropper-canvas`).css("transform");
                 $(`${this.selector} .cropper-container .cropper-drag-box`).css({"height":imageHeightString, "transform": canvasTransform });
             },
@@ -117,10 +117,10 @@ class Plate {
     initSettingsPanel() {
         const html = `<div class="plate-panel" id="${this.panelSelector}">
             <label for="plate-panel_id_${this.id}_width">Breite</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300" value="20">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300" value="300">
 
             <label for="plate-panel_id_${this.id}_height">Höhe</label>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150" value="10">
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150" value="150">
 
             <a href="#" class="button plate-panel__remove">X</a>
         </div>`;
@@ -132,8 +132,26 @@ class Plate {
 
     initSettingsPanelEvents() {
         // Input Width & Height
-        $(`#${this.panelSelector} input`).on('input propertychange', () => {
+        $(`#${this.panelSelector} input`).on('input propertychange', (e) => {
             this.setCropperSizes();
+            
+            // width changed
+            if ($(e.target).has('.width')) {
+                $('.plate-panels').trigger('changedWidth');
+            }
+        });
+
+        //Resize not Scroll
+        let width = $(window).width();
+
+        $(window).resize(() => {
+            if ($(window).width() != width) {
+                //Reset cropper
+                $(this.cropperSelector).cropper('destroy');
+                this.initCropper();
+                
+                width = $(window).width();
+            }
         });
     }
 
@@ -152,46 +170,27 @@ class Plate {
         
         let cropBoxDataObj = $(this.cropperSelector).cropper('getCropBoxData'),
             coord_left_crop = cropBoxDataObj.left,
-            coord_left;
+            coord_left = coord_left_crop < 1 ? 1 : null;
 
-        if (coord_left_crop < 1) {
-            coord_left = 0;
-        } else {
-            if (coord_left_canvas > 0) {
-                coord_left = coord_left_crop - coord_left_canvas;
-            } else {
-                coord_left = coord_left_crop;
-            }
-
+        if (coord_left === null) {
+            coord_left = coord_left_canvas > 0 ? coord_left_crop - coord_left_canvas : coord_left_crop;
             coord_left = roundFloat(coord_left);
         }
 
-        if (coord_left < 1) {
-            coord_left = 0;
-        }
+        coord_left = coord_left < 1 ? 0 : coord_left;
 
         let coord_left_precents = coord_left / image_width_precent;
         coord_left_precents = roundFloat(coord_left_precents);
 
-
         let coord_top_crop = cropBoxDataObj.top,
-            coord_top;
+            coord_top = coord_top_crop < 1 ? 0 : null;
 
-        if (coord_top_crop < 1) {
-            coord_top = 0;
-        } else {
-            if (coord_top_canvas > 0) {
-                coord_top = coord_top_crop - coord_top_canvas;
-            } else{
-                coord_top = coord_top_crop;
-            }
-
+        if (coord_top == null) {
+            coord_top = coord_top_canvas > 0 ? coord_top_crop - coord_top_canvas : coord_top_crop;
             coord_top = roundFloat(coord_top);
         }
 
-        if (coord_top < 1) {
-            coord_top = 0;
-        }
+        coord_top = coord_top < 1 ? 0 : coord_top;
 
         let coord_top_precents = coord_top / image_height_precent;
         coord_top_precents = roundFloat(coord_top_precents);

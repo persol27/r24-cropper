@@ -41,6 +41,11 @@ jQuery(document).ready(($) => {
       panel.removePlate(id);
     });
 
+    // Changed input width
+    $( '.plate-panels' ).on('changedWidth', function() {
+      panel.backgroundUpdate();
+    });
+
     // Replace Image Event
     $( '.panel-replace' ).on('click', function(e) {
       panel.image = './assets/images/image.jpg';
@@ -50,4 +55,12 @@ jQuery(document).ready(($) => {
         item.setCropperImage();
       });
     });
+
+    // Mirroring
+    $( `.background__scale-button` ).on('click', (e) => {
+      e.preventDefault();
+
+      let thisId = $(e.target).parent('.background__item').attr('id');
+      panel.scaleBackground(thisId);
+  });
 });

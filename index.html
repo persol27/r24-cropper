@@ -11,13 +11,18 @@
 </head>
 <body class="body body_no-load">
     <main class="main">
-        <section class="cropper">
+        <section class="main__cropper cropper">
             <div class="container">
                 <div class="col plate_col">
-                    
-                </div>
-                <div class="col">
-                    <a href="#" class="button panel-add">(+) Weitere Rückwand hinzufügen</a>
+                    <div class="cropper__background background">
+                        <div class="background__item" id="background-1">
+                            <a href="#" class="background__scale-button button">Mirroring</a>
+                            <img class="background__image" src="assets/images/image_2.jpg" alt="">
+                        </div>
+                    </div>
+                    <div class="plate-track">
+                        
+                    </div>
                 </div>
             </div>
         </section>
@@ -29,7 +34,7 @@
                 <div class="col">
                     <div class="plate-panels"></div>
 
-                    <a href="#" class="button panel-add">Rückwand hinzufügen (+)</a>
+                    <a href="#" class="button button_color_green panel-add">+ Add new plate</a>
                     <a href="#" class="button panel-replace">Replace image</a>
                 </div>
             </div>
