@@ -272,17 +272,25 @@ jQuery(document).ready(($) => {
         }
     
         setCropperSizes() {
-            //let aspect_ratio = $(`#${this.panelSelector} .width`).val() / $(`#${this.panelSelector} .height`).val();
-            //$(this.cropperSelector).cropper('setAspectRatio', aspect_ratio);
-    
             let plateData = $(this.cropperSelector).cropper('getData');
             plateData.width = Number($(`#${this.panelSelector} .width`).val());
             plateData.height = Number($(`#${this.panelSelector} .height`).val());
     
-            console.log(plateData);
+            console.log(plateData, $(this.cropperSelector));
     
-            $(this.cropperSelector).cropper('setData', plateData)
+            let cropBoxObject = {
+                top:    plateData.y,
+                left:   0,
+                width:  plateData.width,
+                height: plateData.height,
+            };
+    
+            $(this.cropperSelector).cropper('setData', plateData);
+            $(this.cropperSelector).cropper('setCropBoxData', cropBoxObject);
             $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
+            $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
+    
+            setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 200); // Change Width in Container Data obj
         }
     
         setCropperScaleX() {
@@ -478,5 +486,53 @@ jQuery(document).ready(($) => {
 
       let thisId = $(e.target).parent('.background__item').attr('id');
       panel.scaleBackground(thisId);
-  });
+    });
+
+
+    // Draggable Plates Track plate-track
+
+    dragElement(document.querySelector('.plate-track'), '.cropper__background');
+
+    function dragElement(elmnt, container) {
+      let pos1 = 0,
+          pos3 = 0,
+          pos4 = 0;
+      
+      elmnt.onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth - 1},
+            pos_x = elmnt.offsetLeft - pos1;
+
+        pos_x = pos_x < limit.min ? limit.min : pos_x;
+        pos_x = pos_x > limit.max ? limit.max : pos_x;
+        elmnt.style.left = pos_x + "px";
+        console.log($(container).width(), elmnt.clientWidth);
+      }
+
+      function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
 });

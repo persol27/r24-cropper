@@ -254,17 +254,25 @@ class Plate {
     }
 
     setCropperSizes() {
-        //let aspect_ratio = $(`#${this.panelSelector} .width`).val() / $(`#${this.panelSelector} .height`).val();
-        //$(this.cropperSelector).cropper('setAspectRatio', aspect_ratio);
-
         let plateData = $(this.cropperSelector).cropper('getData');
         plateData.width = Number($(`#${this.panelSelector} .width`).val());
         plateData.height = Number($(`#${this.panelSelector} .height`).val());
 
-        console.log(plateData);
+        console.log(plateData, $(this.cropperSelector));
 
-        $(this.cropperSelector).cropper('setData', plateData)
+        let cropBoxObject = {
+            top:    plateData.y,
+            left:   0,
+            width:  plateData.width,
+            height: plateData.height,
+        };
+
+        $(this.cropperSelector).cropper('setData', plateData);
+        $(this.cropperSelector).cropper('setCropBoxData', cropBoxObject);
         $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
+        $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
+
+        setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 200); // Change Width in Container Data obj
     }
 
     setCropperScaleX() {

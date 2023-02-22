@@ -95,7 +95,7 @@ body {
         display: flex;
         background: rgba(196, 196, 196, 0.2);
         border-radius: 24px;
-        padding: 20px 0;
+        padding: 20px 0 80px;
         position: relative;
     }
 }
@@ -104,6 +104,7 @@ body {
     max-width: 100%;
     width: auto;
     height: 98%;
+    pointer-events: none;
 
     &__canvas {
         max-width: 100%;
@@ -147,19 +148,23 @@ body {
 .plate-track {
     max-height: 150px;
     height: 100%;
-    width: 100%;
+    width: auto;
     display: flex;
     align-items: flex-start;
     position: absolute;
     bottom: 1px;
     left: 1px;
+    
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .background {
     margin: 60px 0 0;
     position: relative;
-    width: 100%;
-    display: flex;
+    width: auto;
+    display: inline-flex;
     align-items: center;
     
     &__scale-button {
