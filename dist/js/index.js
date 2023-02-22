@@ -498,6 +498,7 @@ jQuery(document).ready(($) => {
           pos3 = 0,
           pos4 = 0;
       
+      elmnt.ontouchstart = dragTouchStart;
       elmnt.onmousedown = dragMouseDown;
 
       function dragMouseDown(e) {
@@ -506,6 +507,7 @@ jQuery(document).ready(($) => {
         // get the mouse cursor position at startup:
         pos3 = e.clientX;
         pos4 = e.clientY;
+
         document.onmouseup = closeDragElement;
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;
@@ -525,13 +527,49 @@ jQuery(document).ready(($) => {
         pos_x = pos_x < limit.min ? limit.min : pos_x;
         pos_x = pos_x > limit.max ? limit.max : pos_x;
         elmnt.style.left = pos_x + "px";
-        console.log($(container).width(), elmnt.clientWidth);
       }
 
       function closeDragElement() {
         // stop moving when mouse button is released:
         document.onmouseup = null;
         document.onmousemove = null;
+      }
+
+
+      function dragTouchStart(e) {
+        console.log(e);
+        
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.touches[0].clientX;
+        pos4 = e.touches[0].clientY;
+
+        document.ontouchend = closeTouchDragElement;
+        // call a function whenever the cursor moves:
+        document.ontouchmove = elementTouchDrag;
+      }
+
+      function elementTouchDrag(e) {
+        e = e || window.event;
+        
+        // calculate the new cursor position:
+        pos1 = pos3 - e.touches[0].clientX;
+        pos3 = e.touches[0].clientX;
+        pos4 = e.touches[0].clientY;
+        // set the element's new position:
+        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth - 1},
+            pos_x = elmnt.offsetLeft - pos1;
+
+        pos_x = pos_x < limit.min ? limit.min : pos_x;
+        pos_x = pos_x > limit.max ? limit.max : pos_x;
+        elmnt.style.left = pos_x + "px";
+      }
+
+      function closeTouchDragElement() {
+        // stop moving when mouse button is released:
+        document.ontouchend = null;
+        document.ontouchmove = null;
       }
     }
 
