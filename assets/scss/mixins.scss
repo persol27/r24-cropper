@@ -3,3 +3,9 @@
     font-weight: $weight;
     line-height: $height;
 }
+
+@mixin flexCenterAll() {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
