@@ -11,37 +11,78 @@
 </head>
 <body class="body body_no-load">
     <main class="main">
-        <section class="main__cropper cropper">
+        <section class="entry">
             <div class="container">
-                <div class="col plate_col">
-                    <div class="cropper__background background">
-                        <div class="background__item" id="background-1">
-                            <a href="#" class="background__scale-button button">Mirroring</a>
-                            <img class="background__image" src="assets/images/image_2.jpg" alt="">
+                <div class="col">
+                    <h1 class="entry__title title title_align_center">Konfiguriere Deine Küchenrückwand - so wie Du willst</h1>
+                    <h3 class="entry__subtitle subtitle subtitle_font-size_small">So einfach gehts: Maße eingeben, Bildauschnitt & Material wählen - fertig!</h3>
+                </div>
+            </div>
+        </section>
+        <section class="main__cropper cropper">
+            <div class="container container_align_start">
+                <div class="col col-7 plate_col">
+                    <div class="cropper__area">
+                        <div class="cropper__background background">
+                            <div class="background__item" id="background-1">
+                                <a href="#" class="background__scale-button button">Mirroring</a>
+                                <img class="background__image" src="assets/images/image_2.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="plate-track">
+        
                         </div>
                     </div>
-                    <div class="plate-track">
+                </div>
+                <div class="col col-5">
+                    <div class="cropper__customizer customizer">
+                        <div class="plate-panels"></div>
+    
+                        <a href="#" class="button button_width_100 button_color_green panel-add">+ Add new plate</a>
+                        <a href="#" class="button panel-replace" style="display: none;">Replace image</a>
 
+                        <div class="videos">
+                            <div class="video">
+
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+        </section>
+    
+        <section class="material-selection">
+            <div class="container">
+                <div class="col">
+                    <div class="material-selection__slider">
+    
+                    </div>
+                </div>
+                <div class="col">
+                    <h2 class="material-selection__title title">Wähle Dein Material:</h2>
+                    <h3 class="material-selection__subtitle subtitle">Wähle und vergleiche Dein Wunschmaterial</h3>
+    
+                    <ul class="material-selection__list">
+
+                    </ul>
                 </div>
             </div>
         </section>
     </main>
 
-    <aside class="customizer">
-        <section class="cropper">
-            <div class="container">
-                <div class="col">
-                    <div class="plate-panels"></div>
+    <div class="modal">
+        <div class="modal__body">
+            <h2 class="modal__title"></h2>
 
-                    <a href="#" class="button button_color_green panel-add">+ Add new plate</a>
-                    <a href="#" class="button panel-replace">Replace image</a>
-                </div>
+            <div class="modal__content">
+                
             </div>
-        </section>
-    </aside>
+        </div>
+
+        <div class="modal__overlay"></div>
+    </div>
     
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <script src="assets/js/libs/jquery-3.6.3.min.js"></script>
     <script src="assets/js/libs/cropper.min.js"></script>
     <script src="assets/js/libs/jquery-cropper.min.js"></script>
     <script src="dist/js/index.js"></script>
