@@ -2,6 +2,7 @@ class Panel {
     selector; // str
     plates = []; // array
     platesMax = 20;
+    platesActiveIndex = 0;
     image = './assets/images/image_2.jpg'; // default image
 
     constructor() {

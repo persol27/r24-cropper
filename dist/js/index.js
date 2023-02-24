@@ -23,6 +23,16 @@ jQuery(document).ready(($) => {
         panelSelector;
         canvas;
         image; // default image
+        limit = {
+            width: {
+                min: 10,
+                max: 300,
+            },
+            height: {
+                min: 10,
+                max: 150,
+            },
+        };
         
         constructor(id) {
             this.id = id;
@@ -40,7 +50,6 @@ jQuery(document).ready(($) => {
         }
     
         init() {
-    
             // Image Init
             //this.setImageCanvas(this.image);
     
@@ -55,23 +64,19 @@ jQuery(document).ready(($) => {
         }
     
         initEvents() {
-            $(this.selector).on('mouseover', function() {
+            $(this.selector).on('mouseover touchstart', function() {
                 $(this).find('.cropper-center').hide();
-            }).on('mouseleave', function() {
+            }).on('mouseleave touchend', function() {
                 $(this).find('.cropper-center').show();
             });
     
-            $( `${this.selector} .plate__scale` ).on('click', (e) => {
+            $(`${this.selector} .plate__scale`).on('click', (e) => {
                 this.setCropperScaleX();
             });
     
-            $( `#${this.panelSelector} .plate-panel__remove` ).on('click', (e) => {
+            $(`#${this.panelSelector} .plate-panel__remove`).on('click', (e) => {
                 $('.plate-panels').trigger('removePlate', this.id);
             });
-    
-              /*let plate_html = document.querySelector(".plate .cropper-container");
-              plate_html.addEventListener("touchstart", (e) => $( document ).find('.cropper-center').hide(), false);
-              plate_html.addEventListener("touchend",   (e) => $( document ).find('.cropper-center').show(), false);*/
         }
     
         initCropper() {
@@ -132,12 +137,38 @@ jQuery(document).ready(($) => {
         }
     
         initSettingsPanel() {
-            const html = `<div class="plate-panel" id="${this.panelSelector}">
-                <label for="plate-panel_id_${this.id}_width">Breite</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="10" max="300" value="300">
+            const html = `<div class="plate-panel${this.id == 1 ? ' plate-panel_active' : ''}" id="${this.panelSelector}">
+                <div class="plate-panel__index-label label">Panel ${this.id}</div>
     
-                <label for="plate-panel_id_${this.id}_height">Höhe</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="10" max="150" value="150">
+                <div class="plate-panel__control">
+                    <div class="plate-panel__limit icon-text">
+                        <i class="icon"></i>
+                        <span class="text">${this.limit.width.min} - ${this.limit.width.max} cm</span>
+                    </div>
+                    <div class="plate-panel__input-body">
+                        <label for="plate-panel_id_${this.id}_width">Breite</label>
+                        <div class="plate-panel__input-text">
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input width" name="${this.panelSelector}_width" id="${this.panelSelector}_width" min="${this.limit.width.min}" max="${this.limit.width.max}" value="${this.limit.width.max}">
+                            <span class="text">cm</span>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="plate-panel__separator">X</div>
+    
+                <div class="plate-panel__control">
+                    <div class="plate-panel__limit icon-text">
+                        <i class="icon"></i>
+                        <span class="text">${this.limit.height.min} - ${this.limit.height.max} cm</span>
+                    </div>
+                    <div class="plate-panel__input-body">
+                        <label for="plate-panel_id_${this.id}_height">Höhe</label>
+                        <div class="plate-panel__input-text">
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" class="input plate-panel__input height" name="${this.panelSelector}_height" id="${this.panelSelector}_height" min="${this.limit.height.min}" max="${this.limit.height.max}" value="${this.limit.height.max}">
+                            <span class="text">cm</span>
+                        </div>
+                    </div>
+                </div>
     
                 <a href="#" class="button plate-panel__remove">X</a>
             </div>`;
@@ -150,10 +181,22 @@ jQuery(document).ready(($) => {
         initSettingsPanelEvents() {
             // Input Width & Height
             $(`#${this.panelSelector} input`).on('input propertychange', (e) => {
+                let checkInputType = $(e.target).has('.width'),
+                    min = checkInputType ? this.limit.width.min : this.limit.height.min,
+                    max = checkInputType ? this.limit.width.max : this.limit.height.max;
+                
+                if ($(e.target).val() < min) {
+                    $(e.target).val(min);
+                }
+    
+                if ($(e.target).val() > max) {
+                    $(e.target).val(max);
+                }
+    
                 this.setCropperSizes();
                 
                 // width changed
-                if ($(e.target).has('.width')) {
+                if (checkInputType) {
                     $('.plate-panels').trigger('changedWidth');
                 }
             });
@@ -309,6 +352,7 @@ jQuery(document).ready(($) => {
         selector; // str
         plates = []; // array
         platesMax = 20;
+        platesActiveIndex = 0;
         image = './assets/images/image_2.jpg'; // default image
     
         constructor() {
