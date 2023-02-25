@@ -1,4 +1,5 @@
 @import 'mixins.scss';
+@import 'r24-cropper-font/index.scss'; // Vector icons set (Font)
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 $content_width: 1600px;
@@ -93,6 +94,13 @@ body {
     }
 }
 
+.buttons-group {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
 .button {
     text-decoration: none;
     color: #fff;
@@ -104,12 +112,28 @@ body {
     display: inline-block;
     font-size: 14px;
 
+    &_icon {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 10px;
+    }
+
     &_width {
         &_100 {
             width: 100%;
         }
         &_50 {
             width: 50%;
+        }
+    }
+
+    &_weight {
+        &_light {
+            font-weight: 300;
+        }
+        &_bold {
+            font-weight: 700;
         }
     }
 
@@ -125,7 +149,7 @@ body {
 .label {
     width: 110px;
     color: var(--color-white);
-    padding: 6px 0;
+    padding: 5px 0;
     border-radius: 8px;
     text-align: center;
 
@@ -151,6 +175,25 @@ body {
 .cropper {
     &-modal {
         display: none;
+    }
+    &__buttons {
+        padding: 0 38px;
+
+        .button {
+            max-width: 163.5px;
+            width: 100%;
+            justify-content: center;
+            padding: 10.5px 0;
+            background-color: #454645;
+
+            &__icon {
+                font-size: 24px;
+                line-height: 1;
+            }
+            &__text {
+                font-size: 18px;
+            }
+        }
     }
 }
 
@@ -182,17 +225,22 @@ body {
     }
 }
 
-.customizer .col {
-    text-align: right;
+.customizer {
+
+    &__button {
+        padding: 17px 0;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .col {
+        text-align: right;
+    }
 }
 
 .plate-panels {
     text-align: left;
     margin: 0 0 15px;
-
-    .plate-panel:nth-child(1) .plate-panel__remove {
-        display: none;
-    }
 }
 
 .plate-panel {
@@ -200,7 +248,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 35px 64px 37px 38px;
+    padding: 60px 64px 36px 38px;
     background: rgba(196, 196, 196, 0.2);
     border-radius: 12px;
 
@@ -225,9 +273,14 @@ body {
     }
 
     &__limit {
+        position: absolute;
+        top: -23.5px;
+        right: 0;
         margin-bottom: 6px;
         
         .icon {
+            font-size: 12px;
+            color: var(--color-green);
             margin-right: 4.5px;
         }
 
@@ -241,15 +294,27 @@ body {
         $size: 34px;
         position: absolute;
         padding: 0;
-        bottom: 10px;
-        right: 10px;
+        bottom: 8px;
+        right: 8px;
         width: $size;
         height: $size;
-
+        border-radius: 6px;
+        background: #fff;
+        color: #A1A1AA;
         @include flexCenterAll();
+        
+        &-icon {
+            font-size: 19px;
+            color: inherit;
+        }
+    }
+
+    &:nth-child(1) &__remove {
+        display: none;
     }
 
     &__control {
+        position: relative;
         max-width: 252px;
         width: 100%;
         text-align: right;
@@ -262,13 +327,18 @@ body {
 
     &__separator {
         margin: auto 20px;
+        
+        i {
+            font-size: 18px;
+            line-height: 1;
+        }
     }
 
     &__input-body {
         background: #FFFFFF;
         border: 2px solid #D9D9D9;
         border-radius: 12px;
-        padding: 21px 32px 21px 23px;
+        padding: 19px 32px 19px 23px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -307,7 +377,7 @@ body {
     width: 100%;
     background: rgba(196, 196, 196, 0.2);
     border-radius: 24px;
-    padding: 20px 0 80px;
+    padding: 40px 0 50px;
     position: relative;
     overflow-x: scroll;
     overflow-y: hidden;
@@ -362,7 +432,7 @@ body {
 }
 
 .background {
-    margin: 60px 0 0;
+    margin: 25px 0 0;
     position: relative;
     width: auto;
     display: inline-flex;

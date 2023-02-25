@@ -142,7 +142,7 @@ jQuery(document).ready(($) => {
     
                 <div class="plate-panel__control">
                     <div class="plate-panel__limit icon-text">
-                        <i class="icon"></i>
+                        <i class="icon icon-r24-high-priority"></i>
                         <span class="text">${this.limit.width.min} - ${this.limit.width.max} cm</span>
                     </div>
                     <div class="plate-panel__input-body">
@@ -154,11 +154,13 @@ jQuery(document).ready(($) => {
                     </div>
                 </div>
     
-                <div class="plate-panel__separator">X</div>
+                <div class="plate-panel__separator">
+                    <i class="icon-r24-multiply plate-panel__separator-icon"></i>
+                </div>
     
                 <div class="plate-panel__control">
                     <div class="plate-panel__limit icon-text">
-                        <i class="icon"></i>
+                        <i class="icon icon-r24-high-priority"></i>
                         <span class="text">${this.limit.height.min} - ${this.limit.height.max} cm</span>
                     </div>
                     <div class="plate-panel__input-body">
@@ -170,7 +172,9 @@ jQuery(document).ready(($) => {
                     </div>
                 </div>
     
-                <a href="#" class="button plate-panel__remove">X</a>
+                <a href="#" class="button plate-panel__remove">
+                    <i class="icon-r24-trash plate-panel__remove-icon"></i>
+                </a>
             </div>`;
     
             $('.plate-panels').append(html);
@@ -413,7 +417,6 @@ jQuery(document).ready(($) => {
             let id = $('.background__item').last().attr('id').split('-')[1],
                 scaled = $('.background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
                 html = `<div class="background__item" id="background-${Number(id) + 1}">
-                    <a href="#" class="background__scale-button button">Mirroring</a>
                     <img class="background__image${scaled}" src="${this.image}" alt="">
                 </div>`;
     
