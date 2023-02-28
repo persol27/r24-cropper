@@ -42,7 +42,8 @@ jQuery(document).ready(($) => {
             this.panelSelector = `plate-panel_id_${this.id}`;
             this.canvas = document.querySelector(this.cropperSelector);
     
-            const html = `<div class="plate" id="plate_id_${this.id}">
+            const plateWidth = $('#background-1').width() - 2 + 'px';
+            const html = `<div class="plate" id="plate_id_${this.id}" style="width: ${plateWidth}">
                 <canvas class="plate__canvas"></canvas>
             </div>`;
     
@@ -189,12 +190,8 @@ jQuery(document).ready(($) => {
                     min = checkInputType ? this.limit.width.min : this.limit.height.min,
                     max = checkInputType ? this.limit.width.max : this.limit.height.max;
                 
-                if ($(e.target).val() < min) {
-                    $(e.target).val(min);
-                }
-    
-                if ($(e.target).val() > max) {
-                    $(e.target).val(max);
+                if ($(e.target).val() < min || $(e.target).val() > max) {
+                    return;
                 }
     
                 this.setCropperSizes();
@@ -298,6 +295,16 @@ jQuery(document).ready(($) => {
             return this.coords_obj;
         }
     
+        getCropperPxByCm(cm, type) {
+            let pixelsMax = type == 'width' ? $('#background-1').width() : $('#background-1').outerHeight(),
+                cmMax = type == 'width' ? this.limit.width.max : this.limit.height.max;
+          
+            let percentage = cm / (cmMax / 100);
+            let newPixels = (pixelsMax / 100) * percentage;
+    
+            return newPixels - 2;
+        }
+    
         setId(id) {
             this.id = id;
         }
@@ -320,10 +327,14 @@ jQuery(document).ready(($) => {
     
         setCropperSizes() {
             let plateData = $(this.cropperSelector).cropper('getData');
-            plateData.width = Number($(`#${this.panelSelector} .width`).val());
-            plateData.height = Number($(`#${this.panelSelector} .height`).val());
-    
-            console.log(plateData, $(this.cropperSelector));
+            plateData.width = this.getCropperPxByCm(
+                Number($(`#${this.panelSelector} .width`).val()),
+                'width',
+            );
+            plateData.height = this.getCropperPxByCm(
+                Number($(`#${this.panelSelector} .height`).val()),
+                'height',
+            );
     
             let cropBoxObject = {
                 top:    plateData.y,
@@ -332,8 +343,11 @@ jQuery(document).ready(($) => {
                 height: plateData.height,
             };
     
+            console.log('res: w' + this.getCropperPxByCm(plateData.width, 'width') + ', h' + this.getCropperPxByCm(plateData.height, 'height'))
+    
             $(this.cropperSelector).cropper('setData', plateData);
             $(this.cropperSelector).cropper('setCropBoxData', cropBoxObject);
+            $(this.selector).css('width', plateData.width + 'px');
             $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
             $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
     
@@ -368,6 +382,9 @@ jQuery(document).ready(($) => {
     
             // Events Init
             this.initEvents();
+    
+            // Add Background
+            this.backgroundCreate();
         }
     
         initEvents() {
@@ -414,10 +431,11 @@ jQuery(document).ready(($) => {
         }
     
         backgroundCreate() {
-            let id = $('.background__item').last().attr('id').split('-')[1],
+            const cropperWidth = $('.cropper__area').width();
+            let id = $('.background__item').length < 1 ? 0 : $('.background__item').last().attr('id').split('-')[1],
                 scaled = $('.background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-                html = `<div class="background__item" id="background-${Number(id) + 1}">
-                    <img class="background__image${scaled}" src="${this.image}" alt="">
+                html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth - 2}px; height: ${cropperWidth / 2}px;">
+                    <img class="background__image${scaled}" src="${this.image}" alt="" >
                 </div>`;
     
             $('.cropper__background').append(html);
@@ -467,6 +485,7 @@ jQuery(document).ready(($) => {
     
             // Panels recheck
             this.backgroundUpdate();
+            this.platesCheck();
         }
     }
     // Class Customizer
@@ -490,7 +509,73 @@ jQuery(document).ready(($) => {
             
         }
     }
+    class Modal {
+        id;
+        activeClass = 'modal_open';
+        trigger;
+        selector;
+        title;
     
+        constructor(id, title, type, trigger) {
+            this.id = id;
+            this.title = title;
+            this.trigger = trigger;
+            this.type = type;
+    
+            this.init();
+        }
+    
+        init() {
+            this.selector = `#modal-${this.id}`;
+    
+            const html = `<div class="modal" id="${this.selector.slice(1)}">
+                <div class="modal__body">
+                    <h2 class="modal__title">${this.title}</h2>
+                    <div class="modal__content"></div>
+    
+                    <div class="modal__close">
+                        <i class="modal__close-icon icon-r24-multiply plate-panel__separator-icon"></i>
+                    </div>
+                </div>
+    
+                <div class="modal__overlay"></div>
+            </div>`;
+    
+            $('body').append(html);
+    
+            this.initEvents();
+        }
+    
+        initEvents() {
+            // Modal trigger click
+            $(this.trigger).on('click', () => {
+                this.openModal();
+            });
+    
+            // Overlay Click
+            $(`${this.selector} .modal__overlay`).on('click', () => {
+                this.closeModal();
+            });
+    
+            // Close modal button click
+            $(`${this.selector} .modal__close`).on('click', () => {
+                this.closeModal();
+            });
+        }
+    
+        openModal() {
+            $(this.selector).addClass(this.activeClass);
+        }
+    
+        closeModal() {
+            $(this.selector).removeClass(this.activeClass);
+        }
+    
+        destroy() {
+            $(this.selector).remove();
+        }
+    }
+
 
     // Panel Class Init
     const panel = new Panel();
@@ -498,6 +583,9 @@ jQuery(document).ready(($) => {
     // Add plate object
     panel.addPlate(new Plate(1));
 
+    const modals = [
+      new Modal(1, "Preview", "preview", ".cropper__preview-button"),
+    ];
 
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {

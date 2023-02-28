@@ -19,7 +19,8 @@ jQuery(document).ready(($) => {
     //=include plate/index.js
     //=include panel/index.js
     //=include customizer/index.js
-    
+    //=include modal/index.js
+
 
     // Panel Class Init
     const panel = new Panel();
@@ -27,6 +28,9 @@ jQuery(document).ready(($) => {
     // Add plate object
     panel.addPlate(new Plate(1));
 
+    const modals = [
+      new Modal(1, "Preview", "preview", ".cropper__preview-button"),
+    ];
 
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {

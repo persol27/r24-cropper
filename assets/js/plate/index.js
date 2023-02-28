@@ -24,7 +24,8 @@ class Plate {
         this.panelSelector = `plate-panel_id_${this.id}`;
         this.canvas = document.querySelector(this.cropperSelector);
 
-        const html = `<div class="plate" id="plate_id_${this.id}">
+        const plateWidth = $('#background-1').width() - 2 + 'px';
+        const html = `<div class="plate" id="plate_id_${this.id}" style="width: ${plateWidth}">
             <canvas class="plate__canvas"></canvas>
         </div>`;
 
@@ -171,12 +172,8 @@ class Plate {
                 min = checkInputType ? this.limit.width.min : this.limit.height.min,
                 max = checkInputType ? this.limit.width.max : this.limit.height.max;
             
-            if ($(e.target).val() < min) {
-                $(e.target).val(min);
-            }
-
-            if ($(e.target).val() > max) {
-                $(e.target).val(max);
+            if ($(e.target).val() < min || $(e.target).val() > max) {
+                return;
             }
 
             this.setCropperSizes();
@@ -280,6 +277,16 @@ class Plate {
         return this.coords_obj;
     }
 
+    getCropperPxByCm(cm, type) {
+        let pixelsMax = type == 'width' ? $('#background-1').width() : $('#background-1').outerHeight(),
+            cmMax = type == 'width' ? this.limit.width.max : this.limit.height.max;
+      
+        let percentage = cm / (cmMax / 100);
+        let newPixels = (pixelsMax / 100) * percentage;
+
+        return newPixels - 2;
+    }
+
     setId(id) {
         this.id = id;
     }
@@ -302,10 +309,14 @@ class Plate {
 
     setCropperSizes() {
         let plateData = $(this.cropperSelector).cropper('getData');
-        plateData.width = Number($(`#${this.panelSelector} .width`).val());
-        plateData.height = Number($(`#${this.panelSelector} .height`).val());
-
-        console.log(plateData, $(this.cropperSelector));
+        plateData.width = this.getCropperPxByCm(
+            Number($(`#${this.panelSelector} .width`).val()),
+            'width',
+        );
+        plateData.height = this.getCropperPxByCm(
+            Number($(`#${this.panelSelector} .height`).val()),
+            'height',
+        );
 
         let cropBoxObject = {
             top:    plateData.y,
@@ -314,8 +325,11 @@ class Plate {
             height: plateData.height,
         };
 
+        console.log('res: w' + this.getCropperPxByCm(plateData.width, 'width') + ', h' + this.getCropperPxByCm(plateData.height, 'height'))
+
         $(this.cropperSelector).cropper('setData', plateData);
         $(this.cropperSelector).cropper('setCropBoxData', cropBoxObject);
+        $(this.selector).css('width', plateData.width + 'px');
         $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
         $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
 

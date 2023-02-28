@@ -14,6 +14,9 @@ class Panel {
 
         // Events Init
         this.initEvents();
+
+        // Add Background
+        this.backgroundCreate();
     }
 
     initEvents() {
@@ -60,10 +63,11 @@ class Panel {
     }
 
     backgroundCreate() {
-        let id = $('.background__item').last().attr('id').split('-')[1],
+        const cropperWidth = $('.cropper__area').width();
+        let id = $('.background__item').length < 1 ? 0 : $('.background__item').last().attr('id').split('-')[1],
             scaled = $('.background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-            html = `<div class="background__item" id="background-${Number(id) + 1}">
-                <img class="background__image${scaled}" src="${this.image}" alt="">
+            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth - 2}px; height: ${cropperWidth / 2}px;">
+                <img class="background__image${scaled}" src="${this.image}" alt="" >
             </div>`;
 
         $('.cropper__background').append(html);
@@ -113,5 +117,6 @@ class Panel {
 
         // Panels recheck
         this.backgroundUpdate();
+        this.platesCheck();
     }
 }
