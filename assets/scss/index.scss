@@ -172,12 +172,20 @@ body {
     justify-content: start;   
 }
 
+// Section "Cropper"
 .cropper {
+    display: flex;
+    position: relative;
+
     &-modal {
         display: none;
     }
+
     &__buttons {
+        position: sticky;
         padding: 0 38px;
+        left: 0;
+        margin-bottom: 25px;
 
         .button {
             max-width: 163.5px;
@@ -195,19 +203,34 @@ body {
             }
         }
     }
-}
 
-.main {
+    &__area {
+        padding-bottom: 40px;
+        position: inherit;
+        overflow-x: scroll;
+        overflow-y: hidden;
 
-    &__cropper {
-        display: flex;
-        position: relative;
+        &::-webkit-scrollbar {
+            width: 2px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: var(--color-white);
+            margin: 0 40px;
+            border-radius: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #A1A1AA;
+            outline: 1px solid #EBEDF0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     }
 }
 
-.cropper__area {
-    position: relative;
-}
 
 .plate {
     max-width: 100%;
@@ -217,7 +240,7 @@ body {
 
     &__canvas {
         max-width: 100%;
-        min-width: 300px;
+        width: 100%;
     }
 
     &__scale {
@@ -379,18 +402,16 @@ body {
     border-radius: 24px;
     padding: 40px 0 50px;
     position: relative;
-    overflow-x: scroll;
-    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 .plate-track {
-    max-height: 150px;
-    height: 100%;
+    height: calc(100% - 35px);
     width: auto;
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     position: absolute;
-    bottom: 1px;
+    bottom: 34px;
     left: 1px;
 
     &::before {
@@ -432,7 +453,7 @@ body {
 }
 
 .background {
-    margin: 25px 0 0;
+    margin: 0;
     position: relative;
     width: auto;
     display: inline-flex;
@@ -446,13 +467,13 @@ body {
     }
     &__item {
         position: relative;
-        min-width: 300px;
-        max-width: 100%;
+        width: auto;
         height: 100%;
     }
     &__image {
-        max-width: 300px;
+        max-width: 100%;
         width: 100%;
+        height: 100%;
         min-height: 150px;
 
         &_scaled {
@@ -487,7 +508,7 @@ body {
     &__body {
         position: relative;
         z-index: 2;
-        max-width: $content_width;
+        max-width: 1232px;
         width: 100%;
         max-height: 65vh;
         height: auto;
@@ -495,11 +516,28 @@ body {
         border-radius: 12px;
         margin: auto;
         padding: 60px 80px;
+
+        @media (max-width: 1232px) {
+            max-width: 90%;
+            max-height: 75vh;
+            padding: 50px 60px;
+        }
     }
     
     &__title {
         color: var(--color-black);
         @include setFont(42px, 700, 1.25em);
         margin-bottom: 55px;
+    }
+
+    &__close {
+        position: absolute;
+        top: 38px;
+        right: 38px;
+        cursor: pointer;
+    }
+
+    &__close-icon {
+        font-size: 32px;
     }
 }
