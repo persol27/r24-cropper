@@ -333,7 +333,13 @@ class Plate {
         $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
         $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
 
+        $('.plate-track').trigger('checkPosition');
+
         setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 200); // Change Width in Container Data obj
+
+        // Plate Track Position check
+        $('.plate-track').trigger('onmousedown');
+        $(document).trigger('onmousemove').trigger('onmouseup');
     }
 
     setCropperScaleX() {

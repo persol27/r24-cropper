@@ -351,7 +351,13 @@ jQuery(document).ready(($) => {
             $(`${this.selector} .cropper-container`).css('width', plateData.width + 'px');
             $(`${this.selector} .cropper-crop-box`).css('transform', 'none');
     
+            $('.plate-track').trigger('checkPosition');
+    
             setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 200); // Change Width in Container Data obj
+    
+            // Plate Track Position check
+            $('.plate-track').trigger('onmousedown');
+            $(document).trigger('onmousemove').trigger('onmouseup');
         }
     
         setCropperScaleX() {
@@ -485,7 +491,13 @@ jQuery(document).ready(($) => {
     
             // Panels recheck
             this.backgroundUpdate();
-            this.platesCheck();
+            // Plate Track Position check
+            this.plateTrackCheck();
+        }
+    
+        plateTrackCheck() {
+            $('.plate-track').trigger('onmousedown');
+            $(document).trigger('onmousemove').trigger('onmouseup');
         }
     }
     // Class Customizer
@@ -621,6 +633,11 @@ jQuery(document).ready(($) => {
 
       let thisId = $(e.target).parent('.background__item').attr('id');
       panel.scaleBackground(thisId);
+    });
+
+    // Plate Track position check
+    $( '.plate-track' ).on('checkPosition', () => {
+      panel.plateTrackCheck();
     });
 
 

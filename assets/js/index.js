@@ -68,6 +68,11 @@ jQuery(document).ready(($) => {
       panel.scaleBackground(thisId);
     });
 
+    // Plate Track position check
+    $( '.plate-track' ).on('checkPosition', () => {
+      panel.plateTrackCheck();
+    });
+
 
     // Draggable Plates Track plate-track
 

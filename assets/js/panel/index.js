@@ -117,6 +117,12 @@ class Panel {
 
         // Panels recheck
         this.backgroundUpdate();
-        this.platesCheck();
+        // Plate Track Position check
+        this.plateTrackCheck();
+    }
+
+    plateTrackCheck() {
+        $('.plate-track').trigger('onmousedown');
+        $(document).trigger('onmousemove').trigger('onmouseup');
     }
 }
