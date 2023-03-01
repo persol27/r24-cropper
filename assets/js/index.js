@@ -42,12 +42,24 @@ jQuery(document).ready(($) => {
 
     // Remove plate event
     $( '.plate-panels' ).on('removePlate', function(e, id) {
+      if (panel.plates[panel.platesActiveIndex].id === id) {
+        panel.platesActiveIndex = 0;
+        panel.setActivePlate(0);
+      }
+
       panel.removePlate(id);
     });
 
     // Changed input width
     $( '.plate-panels' ).on('changedWidth', function() {
       panel.backgroundUpdate();
+    });
+    
+    // Check active plate
+    $( '.plate-panels' ).on('checkActivePlate', function(e, id) {
+      if (panel.plates[panel.platesActiveIndex].id !== id) {
+        panel.setActivePlate(id);
+      }
     });
 
     // Replace Image Event

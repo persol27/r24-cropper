@@ -120,6 +120,26 @@ class Panel {
         this.plateTrackCheck();
     }
 
+    unsetThisActivePlate() {
+        const oldActivePlate = $('.plate.plate_active'),
+              oldActivePlatePanel = $('.plate-panel.plate-panel_active');
+
+        oldActivePlate.removeClass('plate_active');
+        oldActivePlatePanel.removeClass('plate-panel_active');
+    }
+
+    setActivePlate(id) {
+        this.unsetThisActivePlate();
+
+        let plateIndex = id == 0 ? this.platesActiveIndex : this.plates.findIndex(x => x.id == id);
+        this.platesActiveIndex = plateIndex;
+
+        console.log(plateIndex);
+
+        $(this.plates[plateIndex].selector).addClass('plate_active');
+        $(`#${this.plates[plateIndex].panelSelector}`).addClass('plate-panel_active');
+    }
+
     plateTrackCheck() {
         $('.plate-track').trigger('onmousedown');
         $(document).trigger('onmousemove').trigger('onmouseup');
@@ -167,9 +187,19 @@ class Panel {
             width_array.push({id: $i+1, width: visible_width});
         }
 
-        let active_background = width_array.reduce((prev, curr) => prev.width > curr.width ? prev.id : curr.id);
+        let active_background = width_array.reduce((acc, curr) => acc.width > curr.width ? acc : curr);
+
+        // // debug
+        let debug = false;
+
+        if (debug) {
+            width_array.forEach((el) => {
+                console.log(`id: ${el.id}, width: ${el.width}`);
+            });
+        }
+        // //
 
         // set active background
-        this.backgroundActiveId = active_background;
+        this.backgroundActiveId = active_background.id;
     }
 }

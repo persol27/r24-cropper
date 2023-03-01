@@ -182,6 +182,8 @@ class Plate {
             if (checkInputType) {
                 $('.plate-panels').trigger('changedWidth');
             }
+
+            $('.plate-panels').trigger('checkActivePlate', this.id)
         });
 
         //Resize not Scroll
