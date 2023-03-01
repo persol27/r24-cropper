@@ -138,7 +138,7 @@ jQuery(document).ready(($) => {
         }
     
         initSettingsPanel() {
-            const html = `<div class="plate-panel${this.id == 1 ? ' plate-panel_active' : ''}" id="${this.panelSelector}">
+            const html = `<div class="plate-panel" id="${this.panelSelector}">
                 <div class="plate-panel__index-label label">Panel ${this.id}</div>
     
                 <div class="plate-panel__control">
@@ -377,9 +377,11 @@ jQuery(document).ready(($) => {
         plates = []; // array
         platesMax = 20;
         platesActiveIndex = 0;
+        backgroundActiveId = 1;
         image = './assets/images/image_2.jpg'; // default image
     
-        constructor() {
+        constructor(type) {
+            this.type = type;
     
             this.init();
         }
@@ -394,19 +396,9 @@ jQuery(document).ready(($) => {
         }
     
         initEvents() {
-    
-            //
-            /*let plate_html = document.querySelector(".plate .cropper-container");
-            plate_html.addEventListener("touchstart", (e) => $( document ).find('.cropper-center').hide(), false);
-            plate_html.addEventListener("touchend",   (e) => $( document ).find('.cropper-center').show(), false);*/
-        }
-    
-        convertPxToCm(px) {
-    
-        }
-    
-        convertCmToPx(cm) {
-    
+            $(".cropper__area").on("scroll", () => {
+                this.detectPlateVisibleWidth();
+            });
         }
     
         backgroundUpdate() {
@@ -432,8 +424,10 @@ jQuery(document).ready(($) => {
             }
         }
     
-        scaleBackground(id) {
-            $(`#${id} img`).toggleClass('background__image_scaled');
+        scaleBackground() {
+            let id = document.getElementById(`background-${this.backgroundActiveId}`) === null ? 1 : this.backgroundActiveId;
+    
+            $(`#background-${id} img`).toggleClass('background__image_scaled');
         }
     
         backgroundCreate() {
@@ -469,18 +463,23 @@ jQuery(document).ready(($) => {
             // Left Property Check
             /*if (this.plates.length > 0) {
                 let lastPlate = this.plates[this.plates.length - 1],
-                    leftProp = (($(lastPlate.selector).width() + 2) * this.plates.length) + 'px';
-    
+              
                 $(plate.selector).css('left', leftProp);
             }*/
-    
             plate.image = this.image;
             plate.init();
             
             this.plates.push(plate);
     
+            if (this.plates.length == 1) {
+                $(plate.selector).addClass('plate_active');
+                $(`#${plate.panelSelector}`).addClass('plate-panel_active');
+            }
+    
             // Panels recheck
             this.backgroundUpdate();
+            // Plate Track Position check
+            this.plateTrackCheck();
         }
     
         removePlate(plateIndex) {
@@ -498,6 +497,54 @@ jQuery(document).ready(($) => {
         plateTrackCheck() {
             $('.plate-track').trigger('onmousedown');
             $(document).trigger('onmousemove').trigger('onmouseup');
+        }
+    
+        detectPlateVisibleWidth() {
+            const scrollbarContainer = '.cropper__area',
+                  backgroundContainer = '.cropper__background',
+                  backgroundItemWidh = $(`${backgroundContainer} .background__item:nth-child(1)`).width(),
+                  scrollbar = {
+                    scrollbarWidthIn:   $(backgroundContainer).innerWidth(),
+                    scrollLeft:         $(scrollbarContainer).scrollLeft()
+                };
+    
+            let width_array = [];
+    
+            const backgroundLength = $(`${backgroundContainer} .background__item`).length;
+    
+            for (let $i = 0; $i < backgroundLength; $i++) {
+                let this_width = $(`${backgroundContainer} .background__item`).width(),
+                    this_plate_width = this_width * ($i + 1),
+                    this_scroll_left = $(scrollbarContainer).scrollLeft();
+    
+                let width_limit = {
+                    min: this_plate_width - this_width,
+                    max: this_plate_width,
+                };
+                let visible_width = width_limit.max - this_scroll_left;
+                    visible_width = this_scroll_left < width_limit.min ? 0 : width_limit.max - this_scroll_left;
+    
+                if ($i > 0) {
+                    this_scroll_left = $(scrollbarContainer).scrollLeft() + this_width;
+    
+                    if (this_scroll_left >= width_limit.min && this_scroll_left < width_limit.max) {
+                        visible_width = this_scroll_left - width_limit.min;
+                    } else if (this_scroll_left > width_limit.max) {
+                        visible_width = this_width + (width_limit.max - this_scroll_left);
+                    } else {
+                        visible_width = 0;
+                    }
+                }
+    
+                visible_width = visible_width < 0 ? 0 : Math.round(visible_width);
+    
+                width_array.push({id: $i+1, width: visible_width});
+            }
+    
+            let active_background = width_array.reduce((prev, curr) => prev.width > curr.width ? prev.id : curr.id);
+    
+            // set active background
+            this.backgroundActiveId = active_background;
         }
     }
     // Class Customizer
@@ -628,11 +675,10 @@ jQuery(document).ready(($) => {
     });
 
     // Mirroring
-    $( `.background__scale-button` ).on('click', (e) => {
+    $( `.cropper__scale-button` ).on('click', (e) => {
       e.preventDefault();
 
-      let thisId = $(e.target).parent('.background__item').attr('id');
-      panel.scaleBackground(thisId);
+      panel.scaleBackground();
     });
 
     // Plate Track position check

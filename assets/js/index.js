@@ -61,11 +61,10 @@ jQuery(document).ready(($) => {
     });
 
     // Mirroring
-    $( `.background__scale-button` ).on('click', (e) => {
+    $( `.cropper__scale-button` ).on('click', (e) => {
       e.preventDefault();
 
-      let thisId = $(e.target).parent('.background__item').attr('id');
-      panel.scaleBackground(thisId);
+      panel.scaleBackground();
     });
 
     // Plate Track position check

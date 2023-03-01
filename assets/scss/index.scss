@@ -246,6 +246,12 @@ body {
     &__scale {
         margin: 15px auto 0;
     }
+
+    &_active {
+        .cropper-view-box {
+            outline: 1px solid var(--color-green);
+        }
+    }
 }
 
 .customizer {
@@ -414,7 +420,7 @@ body {
     bottom: 34px;
     left: 1px;
 
-    &::before {
+    /*&::before {
         content: '';
         z-index: 1;
         background-image: url(../../assets/images/hand-move-white.svg);
@@ -432,7 +438,7 @@ body {
 
     &:hover::before {
         display: none;
-    }
+    }*/
     
     &:hover {
         cursor: pointer;

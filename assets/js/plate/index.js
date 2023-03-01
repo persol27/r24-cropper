@@ -120,7 +120,7 @@ class Plate {
     }
 
     initSettingsPanel() {
-        const html = `<div class="plate-panel${this.id == 1 ? ' plate-panel_active' : ''}" id="${this.panelSelector}">
+        const html = `<div class="plate-panel" id="${this.panelSelector}">
             <div class="plate-panel__index-label label">Panel ${this.id}</div>
 
             <div class="plate-panel__control">
