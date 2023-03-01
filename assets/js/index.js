@@ -46,7 +46,6 @@ jQuery(document).ready(($) => {
         panel.platesActiveIndex = 0;
         panel.setActivePlate(0);
       }
-
       panel.removePlate(id);
     });
 
@@ -59,6 +58,9 @@ jQuery(document).ready(($) => {
     $( '.plate-panels' ).on('checkActivePlate', function(e, id) {
       if (panel.plates[panel.platesActiveIndex].id !== id) {
         panel.setActivePlate(id);
+
+        let offsetLeft = document.querySelector('.plate_active').offsetLeft;
+        $('.cropper__area').scrollLeft(offsetLeft);
       }
     });
 
