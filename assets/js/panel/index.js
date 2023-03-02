@@ -58,8 +58,8 @@ class Panel {
 
     backgroundCreate() {
         const cropperWidth = $('.cropper__area').width();
-        let id = $('.background__item').length < 1 ? 0 : $('.background__item').last().attr('id').split('-')[1],
-            scaled = $('.background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
+        let id = $('.cropper__background .background__item').length < 1 ? 0 : $('.cropper__background .background__item').last().attr('id').split('-')[1],
+            scaled = $('.cropper__background .background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
             html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth * 0.8}px; height: ${(cropperWidth * 0.8) / 2}px;">
                 <img class="background__image${scaled}" src="${this.image}" alt="" >
             </div>`;
@@ -76,7 +76,7 @@ class Panel {
     }
 
     backgroundRemoveLast() {
-        $('.background__item').last().remove();
+        $('.cropper__background .background__item').last().remove();
     }
 
     addPlate(plate) {
@@ -241,9 +241,9 @@ class Panel {
                 backgroundOffsetLeft = Math.round(percentage * (backgroundWidth / 100));
 
                 console.log('left', trackOffsetLeft);
-                console.log('plate-width', backgroundPlateWidth);
+                console.log('plate-width', backgroundWidth);
 
-            $('.preview__background').css('margin-left', -(backgroundOffsetLeft) + 'px').css('width', 'calc(100% + ' + backgroundOffsetLeft + 'px');
+            $('.preview__background').css('left', -(backgroundOffsetLeft) + 'px').css('width', ($('.modal__preview').width() + backgroundOffsetLeft) + 'px');
 
             // Plates init
             for (let $i = 0; $i < this.plates.length; $i++) {
@@ -261,7 +261,9 @@ class Panel {
                 console.log('plates l ', this.plates.length);
                 console.log('offset l ', backgroundOffsetLeft);
                 console.log((backgroundOffsetLeft / this.plates.length));
-                let html = `<div class="preview__plate" style="width: ${plate_obj.width}px"></div>`;
+                let html = `<div class="preview__plate" style="width: ${plate_obj.width}px">
+                    <div class="preview__plate-name">Panel ${plate_obj.index + 1}</div>
+                </div>`;
     
                 $('.preview__plates').append(html);
             }

@@ -88,7 +88,7 @@ jQuery(document).ready(($) => {
 
     // Preview Generate
     $( '.cropper' ).on('previewGenerate', () => {
-      //panel.previewInit();
+      panel.previewInit();
     });
 
 

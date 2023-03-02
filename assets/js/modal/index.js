@@ -50,8 +50,8 @@ class Modal {
             if (this.type == 'preview') {
                 $('.cropper').trigger('previewGenerate');
             }
-
-            this.openModal();
+            
+            this.openModal(), 600;
         });
 
         // Overlay Click
