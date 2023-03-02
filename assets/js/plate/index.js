@@ -24,7 +24,7 @@ class Plate {
         this.panelSelector = `plate-panel_id_${this.id}`;
         this.canvas = document.querySelector(this.cropperSelector);
 
-        const plateWidth = $('#background-1').width() - 2 + 'px';
+        const plateWidth = $('#background-1').width() + 'px';
         const html = `<div class="plate" id="plate_id_${this.id}" style="width: ${plateWidth}">
             <canvas class="plate__canvas"></canvas>
         </div>`;
@@ -286,7 +286,7 @@ class Plate {
         let percentage = cm / (cmMax / 100);
         let newPixels = (pixelsMax / 100) * percentage;
 
-        return newPixels - 2;
+        return newPixels;
     }
 
     setId(id) {

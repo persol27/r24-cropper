@@ -86,6 +86,11 @@ jQuery(document).ready(($) => {
       panel.plateTrackCheck();
     });
 
+    // Preview Generate
+    $( '.cropper' ).on('previewGenerate', () => {
+      //panel.previewInit();
+    });
+
 
     // Draggable Plates Track plate-track
 
@@ -119,7 +124,7 @@ jQuery(document).ready(($) => {
         pos3 = e.clientX;
         pos4 = e.clientY;
         // set the element's new position:
-        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth - 1},
+        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth},
             pos_x = elmnt.offsetLeft - pos1;
 
         pos_x = pos_x < limit.min ? limit.min : pos_x;
@@ -156,7 +161,7 @@ jQuery(document).ready(($) => {
         pos3 = e.touches[0].clientX;
         pos4 = e.touches[0].clientY;
         // set the element's new position:
-        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth - 1},
+        let limit = {min: 1, max: $(container).width() - elmnt.clientWidth},
             pos_x = elmnt.offsetLeft - pos1;
 
         pos_x = pos_x < limit.min ? limit.min : pos_x;

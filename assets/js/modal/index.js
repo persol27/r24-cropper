@@ -32,12 +32,25 @@ class Modal {
 
         $('body').append(html);
 
+        // check type
+        if (this.type == 'preview') {
+            const html_preview = `<div class="modal__preview preview">
+                <div class="preview__background background"></div>
+                <div class="preview__plates plates"></div>
+            </div>`
+            this.addContent(html_preview);
+        }
+
         this.initEvents();
     }
 
     initEvents() {
         // Modal trigger click
         $(this.trigger).on('click', () => {
+            if (this.type == 'preview') {
+                $('.cropper').trigger('previewGenerate');
+            }
+
             this.openModal();
         });
 
@@ -50,6 +63,10 @@ class Modal {
         $(`${this.selector} .modal__close`).on('click', () => {
             this.closeModal();
         });
+    }
+
+    addContent(html) {
+        $(`${this.selector} .modal__content`).append(html);
     }
 
     openModal() {

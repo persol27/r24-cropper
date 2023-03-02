@@ -247,9 +247,16 @@ body {
         margin: 15px auto 0;
     }
 
+    .cropper-view-box {
+        outline: 4px solid var(--color-white);
+        outline-offset: -4px;
+        background: rgba(0, 0, 0, 0.05);
+    }
+
     &_active {
         .cropper-view-box {
-            outline: 1px solid var(--color-green);
+            outline: 5px solid var(--color-green);
+            outline-offset: -5px;
         }
     }
 }
@@ -545,5 +552,40 @@ body {
 
     &__close-icon {
         font-size: 32px;
+    }
+}
+
+.preview {
+    overflow: hidden;
+    position: relative;
+    transition: .275s ease-in-out;
+    transform: scale(1);
+    margin: 0 auto;
+
+    &:hover {
+        transform: scale(1.125, 1.25);
+    }
+
+    &__background {
+        position: inherit;
+    }
+    &__background-item {
+        aspect-ratio: 2 / 1;
+    }
+
+    &__plates {
+        position: absolute;
+        left: 0;
+        top: 0;
+        max-width: 100%;
+        width: auto;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+    &__plate {
+        outline: 3px solid #fff;
+        outline-offset: -3px;
+        height: 100%;
     }
 }

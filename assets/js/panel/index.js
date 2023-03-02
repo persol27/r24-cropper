@@ -60,7 +60,7 @@ class Panel {
         const cropperWidth = $('.cropper__area').width();
         let id = $('.background__item').length < 1 ? 0 : $('.background__item').last().attr('id').split('-')[1],
             scaled = $('.background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth - 2}px; height: ${cropperWidth / 2}px;">
+            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth * 0.8}px; height: ${(cropperWidth * 0.8) / 2}px;">
                 <img class="background__image${scaled}" src="${this.image}" alt="" >
             </div>`;
 
@@ -201,5 +201,76 @@ class Panel {
 
         // set active background
         this.backgroundActiveId = active_background.id;
+    }
+    
+    previewDestroy() {
+        $('.preview__background').empty();
+        $('.preview__plates').empty();
+    }
+
+    previewInit() {
+        this.previewDestroy();
+
+        const previewContainerSelector = '.preview';
+        const backgroundSelector = '.background__item';
+        const trackSelector = '.plate-track';
+
+        const backgroundCount = $(backgroundSelector).length;
+        const backgroundPlateWidth = $(backgroundSelector).first().innerWidth();
+
+        const trackOffsetLeft = Math.round($(trackSelector).css( "left" ).slice(0, -2));
+        const platesWidthArray = [];
+        
+        const backgroundInit = () => {
+            // Generate background
+            for (let $i = 0; $i < backgroundCount; $i++) {
+                let id = $i + 1,
+                    scaled = $(`#background-${id}`).find('.background__image').hasClass('background__image_scaled') ? ' background__image_scaled' : '',
+                    html = `<div class="background__item preview__background-item" id="preview-background-${id}">
+                    <img class="background__image${scaled}" src="${this.image}" alt="" >
+                </div>`;
+
+                $('.preview__background').append(html);
+            }
+        };
+
+        const platesInit = () => {
+            // bg move
+            let backgroundWidth = $('.preview__background-item').first().innerWidth();
+            let percentage = trackOffsetLeft / (backgroundPlateWidth / 100),
+                backgroundOffsetLeft = Math.round(percentage * (backgroundWidth / 100));
+
+                console.log('left', trackOffsetLeft);
+                console.log('plate-width', backgroundPlateWidth);
+
+            $('.preview__background').css('margin-left', -(backgroundOffsetLeft) + 'px').css('width', 'calc(100% + ' + backgroundOffsetLeft + 'px');
+
+            // Plates init
+            for (let $i = 0; $i < this.plates.length; $i++) {
+                let this_plate_width = $(this.plates[$i].selector).innerWidth(),
+                    this_percentage = this_plate_width / (backgroundPlateWidth / 100);
+
+                let plate_obj = {
+                    index: $i,
+                    width: Math.round(this_percentage * (backgroundWidth / 100)),
+                };
+    
+                platesWidthArray.push(plate_obj);
+                
+                // //
+                console.log('plates l ', this.plates.length);
+                console.log('offset l ', backgroundOffsetLeft);
+                console.log((backgroundOffsetLeft / this.plates.length));
+                let html = `<div class="preview__plate" style="width: ${plate_obj.width}px"></div>`;
+    
+                $('.preview__plates').append(html);
+            }
+    
+            console.log(platesWidthArray);
+        };
+
+        setTimeout(backgroundInit, 5);
+        setTimeout(platesInit, 50);
+
     }
 }
