@@ -182,33 +182,24 @@ body {
     }
 
     &__buttons {
-        position: sticky;
-        padding: 0 38px;
-        left: 0;
-        margin-bottom: 25px;
-
-        .button {
-            max-width: 163.5px;
-            width: 100%;
-            justify-content: center;
-            padding: 10.5px 0;
-            background-color: #454645;
-
-            &__icon {
-                font-size: 24px;
-                line-height: 1;
-            }
-            &__text {
-                font-size: 18px;
-            }
-        }
+        position: absolute;
+        padding: 0;
+        padding-right: 38px;
+        right: 0;
+        max-width: 205px;
+        width: 100%;
+        background: #f3f3f3;
+        justify-content: flex-end;
+        z-index: 2;
     }
 
     &__area {
+        padding-top: 65px;
         padding-bottom: 40px;
         position: inherit;
         overflow-x: scroll;
         overflow-y: hidden;
+        scroll-behavior: smooth;
 
         &::-webkit-scrollbar {
             width: 2px;
@@ -237,6 +228,7 @@ body {
     width: auto;
     height: 98%;
     pointer-events: none;
+    transform: scaleY(-1);
 
     &__canvas {
         max-width: 100%;
@@ -416,15 +408,36 @@ body {
     padding: 40px 0 50px;
     position: relative;
     overflow-x: hidden;
+
+    .button {
+        $size: 163.5px;
+        max-width: $size;
+        width: $size;
+        justify-content: center;
+        padding: 10.5px 0;
+        background-color: #454645;
+
+        > * {
+            pointer-events: none;
+        }
+
+        &__icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        &__text {
+            font-size: 18px;
+        }
+    }
 }
 
 .plate-track {
-    height: calc(100% - 35px);
+    height: auto; //calc(100% - 35px);
     width: auto;
     display: flex;
     align-items: stretch;
     position: absolute;
-    bottom: 34px;
+    top: 65px;
     left: 1px;
 
     /*&::before {
@@ -474,9 +487,8 @@ body {
     
     &__scale-button {
         position: absolute;
-        top: -50px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: -65px;
+        left: 38px;
     }
     &__item {
         position: relative;
