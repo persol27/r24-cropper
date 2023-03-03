@@ -23,7 +23,7 @@ class Panel {
 
     initEvents() {
         $(".cropper__area").on("scroll", () => {
-            this.detectPlateVisibleWidth();
+            //this.detectPlateVisibleWidth();
         });
     }
 
@@ -34,7 +34,7 @@ class Panel {
             platesWidth = platesWidth + Number($(`#${item.panelSelector} .width`).val());
         });
 
-        let thisBackgroundCount = $('.background__image').length,
+        let thisBackgroundCount = $('.cropper__background .background__item').length,
             newBackgroundCount = Math.ceil(platesWidth / 300); // 300 - cm
 
         if (thisBackgroundCount !== newBackgroundCount) {
@@ -50,17 +50,19 @@ class Panel {
         }
     }
 
-    scaleBackground() {
-        let id = document.getElementById(`background-${this.backgroundActiveId}`) === null ? 1 : this.backgroundActiveId;
-
-        $(`#background-${id} img`).toggleClass('background__image_scaled');
+    scaleBackground(id) {
+        $(`#${id} .background__image`).toggleClass('background__image_scaled');
     }
 
     backgroundCreate() {
         const cropperWidth = $('.cropper__area').width();
         let id = $('.cropper__background .background__item').length < 1 ? 0 : $('.cropper__background .background__item').last().attr('id').split('-')[1],
             scaled = $('.cropper__background .background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${cropperWidth * 0.8}px; height: ${(cropperWidth * 0.8) / 2}px;">
+            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${Math.floor(cropperWidth * 0.561)}px; height: ${Math.floor((cropperWidth * 0.561) / 2)}px;">
+                <a href="#" class="background__scale-button button button_weight_bold button_icon">
+                    <i class="button__icon icon-r24-reflect"></i>
+                    <span class="button__text">Mirroring</span>
+                </a>
                 <img class="background__image${scaled}" src="${this.image}" alt="" >
             </div>`;
 
@@ -71,7 +73,7 @@ class Panel {
             e.preventDefault();
   
             let thisId = $(e.target).parent('.background__item').attr('id');
-            panel.scaleBackground(thisId);
+            this.scaleBackground(thisId);
         });
     }
 
@@ -148,7 +150,7 @@ class Panel {
     detectPlateVisibleWidth() {
         const scrollbarContainer = '.cropper__area',
               backgroundContainer = '.cropper__background',
-              backgroundItemWidh = $(`${backgroundContainer} .background__item:nth-child(1)`).width(),
+              backgroundItemWidth = $(`${backgroundContainer} .background__item`).first().innerWidth(),
               scrollbar = {
                 scrollbarWidthIn:   $(backgroundContainer).innerWidth(),
                 scrollLeft:         $(scrollbarContainer).scrollLeft()
@@ -212,7 +214,7 @@ class Panel {
         this.previewDestroy();
 
         const previewContainerSelector = '.preview';
-        const backgroundSelector = '.background__item';
+        const backgroundSelector = '.cropper__background .background__item';
         const trackSelector = '.plate-track';
 
         const backgroundCount = $(backgroundSelector).length;
@@ -243,7 +245,7 @@ class Panel {
                 console.log('left', trackOffsetLeft);
                 console.log('plate-width', backgroundWidth);
 
-            $('.preview__background').css('left', -(backgroundOffsetLeft) + 'px').css('width', ($('.modal__preview').width() + backgroundOffsetLeft) + 'px');
+            $('.preview__background').css('left', -(backgroundOffsetLeft) + 'px').css('width', ($('.modal__preview').width()) + 'px');
 
             // Plates init
             for (let $i = 0; $i < this.plates.length; $i++) {
@@ -267,12 +269,14 @@ class Panel {
     
                 $('.preview__plates').append(html);
             }
-    
-            console.log(platesWidthArray);
+            
+            // preview container
+            const preview_offset_right = $('.modal__content').innerWidth() - $('.preview__plates').innerWidth();
+            $('.modal__preview').css('max-width', `calc(100% - ${preview_offset_right}px)`);
         };
 
-        setTimeout(backgroundInit, 5);
-        setTimeout(platesInit, 50);
+        setTimeout(backgroundInit, 50);
+        setTimeout(platesInit, 125);
 
     }
 }

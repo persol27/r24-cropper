@@ -166,6 +166,11 @@ class Plate {
     }
 
     initSettingsPanelEvents() {
+        // Set Active
+        $(`#${this.panelSelector}`).on('click', (e) => {
+            $('.plate-panels').trigger('checkActivePlate', this.id);
+        });
+
         // Input Width & Height
         $(`#${this.panelSelector} input`).on('input propertychange', (e) => {
             let checkInputType = $(e.target).has('.width'),
@@ -327,7 +332,7 @@ class Plate {
             height: plateData.height,
         };
 
-        console.log('res: w' + this.getCropperPxByCm(plateData.width, 'width') + ', h' + this.getCropperPxByCm(plateData.height, 'height'))
+        console.log('res: w' + plateData.width + ', h' + plateData.height)
 
         $(this.cropperSelector).cropper('setData', plateData);
         $(this.cropperSelector).cropper('setCropBoxData', cropBoxObject);
@@ -337,11 +342,7 @@ class Plate {
 
         $('.plate-track').trigger('checkPosition');
 
-        setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 200); // Change Width in Container Data obj
-
-        // Plate Track Position check
-        $('.plate-track').trigger('onmousedown');
-        $(document).trigger('onmousemove').trigger('onmouseup');
+        setTimeout(() => document.querySelector(this.cropperSelector).cropper.containerData.width = plateData.width, 150); // Change Width in Container Data obj
     }
 
     setCropperScaleX() {
