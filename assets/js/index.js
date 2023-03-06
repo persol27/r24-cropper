@@ -18,24 +18,28 @@ function roundFloat(num) {
 jQuery(document).ready(($) => {
     //=include plate/index.js
     //=include panel/index.js
-    //=include customizer/index.js
+    //=include background/index.js
     //=include modal/index.js
 
 
     // Panel Class Init
     const panel = new Panel();
-    
-    // Add plate object
-    panel.addPlate(new Plate(1));
-
     const modals = [
       new Modal(1, "Preview", "preview", ".cropper__preview-button"),
     ];
+    
+    // Add background
+    panel.addBackground(new Background(1));
+
+    // Add plate object
+    setTimeout(panel.addPlate(new Plate(1)), 75);
+
+    
 
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {
-      let plate_new_id = $('.plate:last').attr('id');
-      plate_new_id = Number(plate_new_id.split('_')[2]) + 1;
+      let plate_new_id = panel.plates[panel.plates.length - 1].id;
+      plate_new_id = plate_new_id + 1;
 
       panel.addPlate(new Plate(plate_new_id));
     });
@@ -47,6 +51,11 @@ jQuery(document).ready(($) => {
         panel.setActivePlate(0);
       }
       panel.removePlate(id);
+    });
+
+    // Add new background
+    $(".cropper__area").on('backgroundCreate', function(e, id) {
+      panel.addBackground(new Background(id + 1));
     });
 
     // Changed input width
@@ -72,13 +81,6 @@ jQuery(document).ready(($) => {
         item.image = panel.image;
         item.setCropperImage();
       });
-    });
-
-    // Mirroring
-    $( `.cropper__scale-button` ).on('click', (e) => {
-      e.preventDefault();
-
-      panel.scaleBackground();
     });
 
     // Plate Track position check

@@ -380,6 +380,7 @@ jQuery(document).ready(($) => {
         plates = []; // array
         platesMax = 20;
         platesActiveIndex = 0;
+        backgrounds = []; // array
         backgroundActiveId = 1;
         image = './assets/images/image_2.jpg'; // default image
     
@@ -393,9 +394,6 @@ jQuery(document).ready(($) => {
     
             // Events Init
             this.initEvents();
-    
-            // Add Background
-            this.backgroundCreate();
         }
     
         initEvents() {
@@ -411,51 +409,51 @@ jQuery(document).ready(($) => {
                 platesWidth = platesWidth + Number($(`#${item.panelSelector} .width`).val());
             });
     
-            let thisBackgroundCount = $('.cropper__background .background__item').length,
+            let thisBackgroundCount = this.backgrounds.length,
                 newBackgroundCount = Math.ceil(platesWidth / 300); // 300 - cm
     
             if (thisBackgroundCount !== newBackgroundCount) {
                 while (thisBackgroundCount !== newBackgroundCount) {
                     if (thisBackgroundCount > newBackgroundCount) {
-                        this.backgroundRemoveLast();
+                        this.removeBackgroundLast();
                         thisBackgroundCount--;
                     } else {
-                        this.backgroundCreate();
+                        this.triggerBackgroundCreate();
                         thisBackgroundCount++;
                     }
                 }
             }
         }
     
-        scaleBackground(id) {
-            $(`#${id} .background__image`).toggleClass('background__image_scaled');
+        triggerBackgroundCreate() {
+            $(".cropper__area").trigger('backgroundCreate', this.backgrounds.length);
         }
     
-        backgroundCreate() {
+        addBackground(background) {
             const cropperWidth = $('.cropper__area').width();
-            let id = $('.cropper__background .background__item').length < 1 ? 0 : $('.cropper__background .background__item').last().attr('id').split('-')[1],
-                scaled = $('.cropper__background .background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-                html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${Math.floor(cropperWidth * 0.561)}px; height: ${Math.floor((cropperWidth * 0.561) / 2)}px;">
-                    <a href="#" class="background__scale-button button button_weight_bold button_icon">
-                        <i class="button__icon icon-r24-reflect"></i>
-                        <span class="button__text">Mirroring</span>
-                    </a>
-                    <img class="background__image${scaled}" src="${this.image}" alt="" >
-                </div>`;
     
-            $('.cropper__background').append(html);
+            // Limit check
+            if (this.backgrounds.length >= this.platesMax) {
+                alert(`Sorry, limit: ${this.platesMax}`);
+                return;
+            }
     
-            // Mirroring Event
-            $( `#background-${Number(id) + 1} .background__scale-button` ).on('click', (e) => {
-                e.preventDefault();
-      
-                let thisId = $(e.target).parent('.background__item').attr('id');
-                this.scaleBackground(thisId);
-            });
+            let scaled = false;
+    
+            if (this.backgrounds.length > 0) {
+                scaled = $(this.backgrounds[this.backgrounds.length - 1].selectorImage).hasClass('background__image_scaled') === false ? true : false;
+            }
+    
+            background.init(cropperWidth, this.image, scaled);
+            
+            this.backgrounds.push(background);
         }
     
-        backgroundRemoveLast() {
-            $('.cropper__background .background__item').last().remove();
+        removeBackgroundLast() {
+            const backgroundId = this.backgrounds.length - 1;
+            
+            this.backgrounds[backgroundId].destroy();
+            this.backgrounds.splice(backgroundId, 1);
         }
     
         addPlate(plate) {
@@ -589,13 +587,11 @@ jQuery(document).ready(($) => {
     
         previewInit() {
             this.previewDestroy();
-    
-            const previewContainerSelector = '.preview';
-            const backgroundSelector = '.cropper__background .background__item';
+            
             const trackSelector = '.plate-track';
     
-            const backgroundCount = $(backgroundSelector).length;
-            const backgroundPlateWidth = $(backgroundSelector).first().innerWidth();
+            const backgroundCount = this.backgrounds.length;
+            const backgroundPlateWidth = $(this.backgrounds[0].selector).innerWidth();
     
             const trackOffsetLeft = Math.round($(trackSelector).css( "left" ).slice(0, -2));
             const platesWidthArray = [];
@@ -657,25 +653,71 @@ jQuery(document).ready(($) => {
     
         }
     }
-    // Class Customizer
-    class Customizer {
-        constructor() {
+    class Background {
+        id;
+        image;
+        width;
+        widthCoef = 0.561;
+        height;
+        parentSelector = '.cropper__background';
+        selector;
+        selectorImage;
     
-            this.init();
+        constructor(id) {
+            this.id = id;
+    
+            this.selector = `#background-${this.id}`;
+            this.selectorImage = `${this.selector} .background__image`;
         }
     
-        init() {
+        init(width, image, scaled) {
+            this.image = image;
+            this.setWidth(width);
     
-            // Events Init
+            this.initTemplate(scaled);
             this.initEvents();
         }
     
-        initEvents() {
+        initTemplate(scaled) {
+            const html = `<div class="background__item" id="${this.selector.slice(1)}" style="width: ${Math.floor(this.width)}px; height: ${Math.floor(this.height)}px;">
+                <a href="#" class="background__scale-button button button_weight_bold button_icon">
+                    <i class="button__icon icon-r24-reflect"></i>
+                    <span class="button__text">Mirroring</span>
+                </a>
+                <img class="background__image${scaled ? ' background__image_scaled' : ''}" src="${this.image}" alt="" >
+            </div>`;
     
+            $(this.parentSelector).append(html);
+    
+            $(this.selector).css('opacity', 0);
+            $(this.selector).animate({opacity: 1}, 375);
         }
     
-        addPlateSettings() {
-            
+        initEvents() {
+            // Mirroring Event
+            $( `${this.selector} .background__scale-button` ).on('click', (e) => {
+                e.preventDefault();
+      
+                this.scaleX();
+            });
+        }
+        
+        scaleX() {
+            $(this.selectorImage).toggleClass('background__image_scaled');
+        }
+    
+        setWidth(width) {
+            this.width = width * this.widthCoef;
+            this.height = this.width / 2;
+        }
+    
+        destroy() {
+            $(this.selector).animate(
+                {opacity: 0},
+                375,
+                "linear",
+                () => $(this.selector).remove()
+            );
         }
     }
     class Modal {
@@ -765,18 +807,22 @@ jQuery(document).ready(($) => {
 
     // Panel Class Init
     const panel = new Panel();
-    
-    // Add plate object
-    panel.addPlate(new Plate(1));
-
     const modals = [
       new Modal(1, "Preview", "preview", ".cropper__preview-button"),
     ];
+    
+    // Add background
+    panel.addBackground(new Background(1));
+
+    // Add plate object
+    setTimeout(panel.addPlate(new Plate(1)), 75);
+
+    
 
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {
-      let plate_new_id = $('.plate:last').attr('id');
-      plate_new_id = Number(plate_new_id.split('_')[2]) + 1;
+      let plate_new_id = panel.plates[panel.plates.length - 1].id;
+      plate_new_id = plate_new_id + 1;
 
       panel.addPlate(new Plate(plate_new_id));
     });
@@ -788,6 +834,11 @@ jQuery(document).ready(($) => {
         panel.setActivePlate(0);
       }
       panel.removePlate(id);
+    });
+
+    // Add new background
+    $(".cropper__area").on('backgroundCreate', function(e, id) {
+      panel.addBackground(new Background(id + 1));
     });
 
     // Changed input width
@@ -813,13 +864,6 @@ jQuery(document).ready(($) => {
         item.image = panel.image;
         item.setCropperImage();
       });
-    });
-
-    // Mirroring
-    $( `.cropper__scale-button` ).on('click', (e) => {
-      e.preventDefault();
-
-      panel.scaleBackground();
     });
 
     // Plate Track position check

@@ -3,6 +3,7 @@ class Panel {
     plates = []; // array
     platesMax = 20;
     platesActiveIndex = 0;
+    backgrounds = []; // array
     backgroundActiveId = 1;
     image = './assets/images/image_2.jpg'; // default image
 
@@ -16,9 +17,6 @@ class Panel {
 
         // Events Init
         this.initEvents();
-
-        // Add Background
-        this.backgroundCreate();
     }
 
     initEvents() {
@@ -34,51 +32,51 @@ class Panel {
             platesWidth = platesWidth + Number($(`#${item.panelSelector} .width`).val());
         });
 
-        let thisBackgroundCount = $('.cropper__background .background__item').length,
+        let thisBackgroundCount = this.backgrounds.length,
             newBackgroundCount = Math.ceil(platesWidth / 300); // 300 - cm
 
         if (thisBackgroundCount !== newBackgroundCount) {
             while (thisBackgroundCount !== newBackgroundCount) {
                 if (thisBackgroundCount > newBackgroundCount) {
-                    this.backgroundRemoveLast();
+                    this.removeBackgroundLast();
                     thisBackgroundCount--;
                 } else {
-                    this.backgroundCreate();
+                    this.triggerBackgroundCreate();
                     thisBackgroundCount++;
                 }
             }
         }
     }
 
-    scaleBackground(id) {
-        $(`#${id} .background__image`).toggleClass('background__image_scaled');
+    triggerBackgroundCreate() {
+        $(".cropper__area").trigger('backgroundCreate', this.backgrounds.length);
     }
 
-    backgroundCreate() {
+    addBackground(background) {
         const cropperWidth = $('.cropper__area').width();
-        let id = $('.cropper__background .background__item').length < 1 ? 0 : $('.cropper__background .background__item').last().attr('id').split('-')[1],
-            scaled = $('.cropper__background .background__item').last().find('.background__image').hasClass('background__image_scaled') ? '' : ' background__image_scaled',
-            html = `<div class="background__item" id="background-${Number(id) + 1}" style="width: ${Math.floor(cropperWidth * 0.561)}px; height: ${Math.floor((cropperWidth * 0.561) / 2)}px;">
-                <a href="#" class="background__scale-button button button_weight_bold button_icon">
-                    <i class="button__icon icon-r24-reflect"></i>
-                    <span class="button__text">Mirroring</span>
-                </a>
-                <img class="background__image${scaled}" src="${this.image}" alt="" >
-            </div>`;
 
-        $('.cropper__background').append(html);
+        // Limit check
+        if (this.backgrounds.length >= this.platesMax) {
+            alert(`Sorry, limit: ${this.platesMax}`);
+            return;
+        }
 
-        // Mirroring Event
-        $( `#background-${Number(id) + 1} .background__scale-button` ).on('click', (e) => {
-            e.preventDefault();
-  
-            let thisId = $(e.target).parent('.background__item').attr('id');
-            this.scaleBackground(thisId);
-        });
+        let scaled = false;
+
+        if (this.backgrounds.length > 0) {
+            scaled = $(this.backgrounds[this.backgrounds.length - 1].selectorImage).hasClass('background__image_scaled') === false ? true : false;
+        }
+
+        background.init(cropperWidth, this.image, scaled);
+        
+        this.backgrounds.push(background);
     }
 
-    backgroundRemoveLast() {
-        $('.cropper__background .background__item').last().remove();
+    removeBackgroundLast() {
+        const backgroundId = this.backgrounds.length - 1;
+        
+        this.backgrounds[backgroundId].destroy();
+        this.backgrounds.splice(backgroundId, 1);
     }
 
     addPlate(plate) {
@@ -212,13 +210,11 @@ class Panel {
 
     previewInit() {
         this.previewDestroy();
-
-        const previewContainerSelector = '.preview';
-        const backgroundSelector = '.cropper__background .background__item';
+        
         const trackSelector = '.plate-track';
 
-        const backgroundCount = $(backgroundSelector).length;
-        const backgroundPlateWidth = $(backgroundSelector).first().innerWidth();
+        const backgroundCount = this.backgrounds.length;
+        const backgroundPlateWidth = $(this.backgrounds[0].selector).innerWidth();
 
         const trackOffsetLeft = Math.round($(trackSelector).css( "left" ).slice(0, -2));
         const platesWidthArray = [];
