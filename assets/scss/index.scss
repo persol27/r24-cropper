@@ -501,9 +501,13 @@ body {
         height: 100%;
         min-height: 150px;
         transition: .275s linear;
+        transform: scale(1);
 
         &_scaled {
             transform: scale(-1, 1);
+        }
+        &_hidden {
+            transform: scale(0);
         }
     }
 }

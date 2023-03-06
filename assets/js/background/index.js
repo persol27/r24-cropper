@@ -25,17 +25,24 @@ class Background {
 
     initTemplate(scaled) {
         const html = `<div class="background__item" id="${this.selector.slice(1)}" style="width: ${Math.floor(this.width)}px; height: ${Math.floor(this.height)}px;">
-            <a href="#" class="background__scale-button button button_weight_bold button_icon">
+            <a href="#" class="background__scale-button button button_weight_bold button_icon" style="opacity: 0;">
                 <i class="button__icon icon-r24-reflect"></i>
                 <span class="button__text">Mirroring</span>
             </a>
-            <img class="background__image${scaled ? ' background__image_scaled' : ''}" src="${this.image}" alt="" >
+            <img class="background__image_hidden background__image${scaled ? ' background__image_scaled' : ''}" src="${this.image}" alt="" >
         </div>`;
 
         $(this.parentSelector).append(html);
 
-        $(this.selector).css('opacity', 0);
-        $(this.selector).animate({opacity: 1}, 375);
+        //
+        $(`${this.selector} .background__scale-button`).animate(
+            {opacity: 1}, 150,'linear',
+        );
+        
+        //
+        setTimeout(() => {
+            $(this.selectorImage).removeClass('background__image_hidden');
+        }, 150);
     }
 
     initEvents() {
@@ -57,11 +64,11 @@ class Background {
     }
 
     destroy() {
-        $(this.selector).animate(
-            {opacity: 0},
-            375,
-            "linear",
-            () => $(this.selector).remove()
-        );
+        $(this.selectorImage).addClass('background__image_hidden');
+        $(`${this.selector} .background__scale-button`).animate({opacity: 0}, 150, 'linear', () =>  $(`${this.selector} .background__scale-button`).remove());
+
+        setTimeout(() => {
+            $(this.selector).remove();
+        }, 250);
     }
 }
