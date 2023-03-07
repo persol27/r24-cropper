@@ -405,7 +405,7 @@ jQuery(document).ready(($) => {
         }
     
         initTemplate() {
-            const html = `<div class="stage main__${this.name} ${this.name}" id="stage-${this.id}">
+            const html = `<section class="stage main__${this.name} ${this.name}" id="stage-${this.id}">
                 <div class="container container_align_start">
                     <div class="col col-7${this.type == 'cropper' ? ' plate_col' : ''}">
                         ${this.content}
@@ -420,7 +420,7 @@ jQuery(document).ready(($) => {
                         <div class="stage__videos videos"></div>
                     </div>
                 </div>
-            </div>`;
+            </section>`;
     
             $(this.parentSelector).append(html);
     
