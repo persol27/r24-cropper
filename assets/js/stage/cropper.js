@@ -1,28 +1,12 @@
-class Panel {
-    selector; // str
-    plates = []; // array
+class CropperStage extends Stage {
+    backgrounds = [];
+    plates = [];
     platesMax = 20;
     platesActiveIndex = 0;
-    backgrounds = []; // array
-    backgroundActiveId = 1;
-    image = './assets/images/image_2.jpg'; // default image
+    image = './assets/images/image_2.jpg';
 
-    constructor(type) {
-        this.type = type;
-
-        this.init();
-    }
-
-    init() {
-
-        // Events Init
-        this.initEvents();
-    }
-
-    initEvents() {
-        $(".cropper__area").on("scroll", () => {
-            //this.detectPlateVisibleWidth();
-        });
+    constructor(name, title, subtitle) {
+        super(name, title, subtitle);
     }
 
     backgroundUpdate() {
@@ -134,6 +118,8 @@ class Panel {
         let plateIndex = id == 0 ? this.platesActiveIndex : this.plates.findIndex(x => x.id == id);
         this.platesActiveIndex = plateIndex;
 
+        console.log(plateIndex);
+
         $(this.plates[plateIndex].selector).addClass('plate_active');
         $(`#${this.plates[plateIndex].panelSelector}`).addClass('plate-panel_active');
     }
@@ -143,64 +129,6 @@ class Panel {
         $(document).trigger('onmousemove').trigger('onmouseup');
     }
 
-    detectPlateVisibleWidth() {
-        const scrollbarContainer = '.cropper__area',
-              backgroundContainer = '.cropper__background',
-              backgroundItemWidth = $(`${backgroundContainer} .background__item`).first().innerWidth(),
-              scrollbar = {
-                scrollbarWidthIn:   $(backgroundContainer).innerWidth(),
-                scrollLeft:         $(scrollbarContainer).scrollLeft()
-            };
-
-        let width_array = [];
-
-        const backgroundLength = $(`${backgroundContainer} .background__item`).length;
-
-        for (let $i = 0; $i < backgroundLength; $i++) {
-            let this_width = $(`${backgroundContainer} .background__item`).width(),
-                this_plate_width = this_width * ($i + 1),
-                this_scroll_left = $(scrollbarContainer).scrollLeft();
-
-            let width_limit = {
-                min: this_plate_width - this_width,
-                max: this_plate_width,
-            };
-            let visible_width = width_limit.max - this_scroll_left;
-                visible_width = this_scroll_left < width_limit.min ? 0 : width_limit.max - this_scroll_left;
-
-            if ($i > 0) {
-                this_scroll_left = $(scrollbarContainer).scrollLeft() + this_width;
-
-                if (this_scroll_left >= width_limit.min && this_scroll_left < width_limit.max) {
-                    visible_width = this_scroll_left - width_limit.min;
-                } else if (this_scroll_left > width_limit.max) {
-                    visible_width = this_width + (width_limit.max - this_scroll_left);
-                } else {
-                    visible_width = 0;
-                }
-            }
-
-            visible_width = visible_width < 0 ? 0 : Math.round(visible_width);
-
-            width_array.push({id: $i+1, width: visible_width});
-        }
-
-        let active_background = width_array.reduce((acc, curr) => acc.width > curr.width ? acc : curr);
-
-        // // debug
-        let debug = false;
-
-        if (debug) {
-            width_array.forEach((el) => {
-                console.log(`id: ${el.id}, width: ${el.width}`);
-            });
-        }
-        // //
-
-        // set active background
-        this.backgroundActiveId = active_background.id;
-    }
-    
     previewDestroy() {
         $('.preview__background').empty();
         $('.preview__plates').empty();
@@ -212,13 +140,16 @@ class Panel {
         const trackSelector = '.plate-track';
 
         const backgroundCount = this.backgrounds.length;
-        const backgroundPlateWidth = $(this.backgrounds[0].selector).innerWidth();
+        const backgroundPlateWidth = $(this.backgrounds[0].parentSelector).innerWidth();
 
         const trackOffsetLeft = Math.round($(trackSelector).css( "left" ).slice(0, -2));
+        const trackOffsetRight = Math.round(backgroundPlateWidth - ($(trackSelector).width() + Number(trackOffsetLeft)));
         const platesWidthArray = [];
+
+        let platesWidth = 0;
         
+        // Generate background
         const backgroundInit = () => {
-            // Generate background
             for (let $i = 0; $i < backgroundCount; $i++) {
                 let id = $i + 1,
                     scaled = $(`#background-${id}`).find('.background__image').hasClass('background__image_scaled') ? ' background__image_scaled' : '',
@@ -232,14 +163,25 @@ class Panel {
 
         const platesInit = () => {
             // bg move
-            let backgroundWidth = $('.preview__background-item').first().innerWidth();
-            let percentage = trackOffsetLeft / (backgroundPlateWidth / 100),
-                backgroundOffsetLeft = Math.round(percentage * (backgroundWidth / 100));
+            let backgroundWidth = $('.modal__content').first().innerWidth();
+            let percentage = {
+                left: trackOffsetLeft / (backgroundPlateWidth / 100),
+                right: trackOffsetRight / (backgroundPlateWidth / 100),
+            },
+                backgroundOffsetLeft = Math.round(percentage.left * (backgroundWidth / 100)),
+                backgroundOffsetRight = Math.round(percentage.right * (backgroundWidth / 100));
 
                 console.log('left', trackOffsetLeft);
                 console.log('plate-width', backgroundWidth);
 
-            $('.preview__background').css('left', -(backgroundOffsetLeft) + 'px').css('width', ($('.modal__preview').width()) + 'px');
+            //$('.preview__background').css('right', `${-(backgroundOffsetLeft)}px`).css('margin-left', `${-(backgroundOffsetRight)}px`);
+            console.log(backgroundOffsetRight, backgroundOffsetLeft);
+
+            // Left
+            $('.preview__background-item').first().css('margin-left', `${-(backgroundOffsetLeft)}px`)
+
+            // Right
+            $('.preview__background-item').last().css('margin-right', `${-(backgroundOffsetRight)}px`)
 
             // Plates init
             for (let $i = 0; $i < this.plates.length; $i++) {
@@ -252,6 +194,7 @@ class Panel {
                 };
     
                 platesWidthArray.push(plate_obj);
+                platesWidth = platesWidth + plate_obj.width;
                 
                 // //
                 console.log('plates l ', this.plates.length);
@@ -265,61 +208,12 @@ class Panel {
             }
             
             // preview container
-            const preview_offset_right = $('.modal__content').width() - $('.preview__plates').width();
+            const preview_offset_right = $('.modal__content').width() - platesWidth;
             $('.modal__preview').css('max-width', `calc(100% - ${preview_offset_right}px)`);
         };
 
         setTimeout(backgroundInit, 50);
         setTimeout(platesInit, 125);
 
-    }
-}
-
-class PanelNew {
-    title;
-    subtitle;
-    selector;
-    modals = [];
-    stages = [];
-
-    constructor(selector, title, subtitle) {
-        this.selector = selector;
-        this.title = title;
-        this.subtitle = subtitle;
-    }
-
-    addStage(stage) {
-        const id = this.stages.length + 1;
-
-        stage.parentSelector = this.selector;
-
-        if (stage.name == 'cropper') {
-            stage.type = 'cropper';
-        }
-
-        stage.init(id);
-        
-        this.stages.push(stage);
-    }
-
-    removeStage(stageId) {
-        const stageIndex = this.stages.findIndex(x => x.id == stageId);
-        
-        this.stages[stageIndex].destroy();
-        this.stages.splice(stageIndex, 1);
-    }
-
-    addModal(modal) {
-        const id = this.modals.length + 1;
-        modal.init(id);
-        
-        this.modals.push(modal);
-    }
-
-    removeModal(modalId) {
-        const modalIndex = this.modals.findIndex(x => x.id == modalId);
-        
-        this.modals[modalIndex].destroy();
-        this.modals.splice(modalIndex, 1);
     }
 }

@@ -16,57 +16,75 @@ function roundFloat(num) {
 }
 
 jQuery(document).ready(($) => {
-    //=include plate/index.js
     //=include panel/index.js
-    //=include background/index.js
+    //=include stage/index.js
+    //=include stage/cropper.js
+
     //=include modal/index.js
+    //=include video/index.js
 
+    //=include plate/index.js
+    //=include background/index.js
 
-    // Panel Class Init
-    const panel = new Panel();
-    const modals = [
-      new Modal(1, "Preview", "preview", ".cropper__preview-button"),
-    ];
-    
+    const panel = new PanelNew('.main', 'ss', 'ss3');
+    panel.addStage(
+      new CropperStage(
+        'cropper',
+        'Wähle Deine Maße',
+        'Wie findest Du die richtigen Maße?',
+      )
+    );
+
     // Add background
-    panel.addBackground(new Background(1));
+    panel.stages[0].addBackground(new Background(1));
 
     // Add plate object
-    setTimeout(panel.addPlate(new Plate(1)), 75);
+    setTimeout(panel.stages[0].addPlate(new Plate(1)), 75);
+
+    // Panel Modal Init
+    panel.addModal(
+      new Modal("Preview", "preview", ".cropper__preview-button")
+    );
+    
+    // Add background
+    //panel.addBackground(new Background(1));
+
+    // Add plate object
+    //setTimeout(panel.addPlate(new Plate(1)), 75);
 
     
 
     // Add new plate event
     $( '.panel-add' ).on('click', function(e) {
-      let plate_new_id = panel.plates[panel.plates.length - 1].id;
+      let plate_new_id = panel.stages[0].plates[panel.stages[0].plates.length - 1].id;
       plate_new_id = plate_new_id + 1;
 
-      panel.addPlate(new Plate(plate_new_id));
+      panel.stages[0].addPlate(new Plate(plate_new_id));
     });
 
     // Remove plate event
     $( '.plate-panels' ).on('removePlate', function(e, id) {
-      if (panel.plates[panel.platesActiveIndex].id === id) {
-        panel.platesActiveIndex = 0;
-        panel.setActivePlate(0);
+      if (panel.stages[0].plates[panel.stages[0].platesActiveIndex].id === id) {
+        panel.stages[0].platesActiveIndex = 0;
+        panel.stages[0].setActivePlate(0);
       }
-      panel.removePlate(id);
+      panel.stages[0].removePlate(id);
     });
 
     // Add new background
     $(".cropper__area").on('backgroundCreate', function(e, id) {
-      panel.addBackground(new Background(id + 1));
+      panel.stages[0].addBackground(new Background(id + 1));
     });
 
     // Changed input width
     $( '.plate-panels' ).on('changedWidth', function() {
-      panel.backgroundUpdate();
+      panel.stages[0].backgroundUpdate();
     });
     
     // Check active plate
     $( '.plate-panels' ).on('checkActivePlate', function(e, id) {
-      if (panel.plates[panel.platesActiveIndex].id !== id) {
-        panel.setActivePlate(id);
+      if (panel.stages[0].plates[panel.stages[0].platesActiveIndex].id !== id) {
+        panel.stages[0].setActivePlate(id);
 
         let offsetLeft = document.querySelector('.plate_active').offsetLeft;
         $('.cropper__area').scrollLeft(offsetLeft);
@@ -75,22 +93,22 @@ jQuery(document).ready(($) => {
 
     // Replace Image Event
     $( '.panel-replace' ).on('click', function(e) {
-      panel.image = './assets/images/image.jpg';
+      panel.stages[0].image = './assets/images/image.jpg';
       
-      panel.plates.forEach((item) => {
-        item.image = panel.image;
+      panel.stages[0].plates.forEach((item) => {
+        item.image = panel.stages[0].image;
         item.setCropperImage();
       });
     });
 
     // Plate Track position check
     $( '.plate-track' ).on('checkPosition', () => {
-      panel.plateTrackCheck();
+      panel.stages[0].plateTrackCheck();
     });
 
     // Preview Generate
     $( '.cropper' ).on('previewGenerate', () => {
-      panel.previewInit();
+      panel.stages[0].previewInit();
     });
 
 

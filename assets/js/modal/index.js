@@ -5,16 +5,14 @@ class Modal {
     selector;
     title;
 
-    constructor(id, title, type, trigger) {
-        this.id = id;
+    constructor(title, type, trigger) {
         this.title = title;
         this.trigger = trigger;
         this.type = type;
-
-        this.init();
     }
 
-    init() {
+    init(id) {
+        this.id = id;
         this.selector = `#modal-${this.id}`;
 
         const html = `<div class="modal" id="${this.selector.slice(1)}">
