@@ -476,6 +476,8 @@ jQuery(document).ready(($) => {
                 alert(`Sorry, limit: ${this.platesMax}`);
                 return;
             }
+            // First check
+    
     
             let scaled = false;
     
@@ -486,6 +488,10 @@ jQuery(document).ready(($) => {
             background.init(cropperWidth, this.image, scaled);
             
             this.backgrounds.push(background);
+    
+            if (this.backgrounds.length == 1) {
+                $('.plate-track').height( $('.cropper__background').height() );
+            }
         }
     
         removeBackgroundLast() {
@@ -1039,13 +1045,13 @@ jQuery(document).ready(($) => {
 
                 crop: (event) => {
 
-                    console.log(event.detail.x);
+                    console.log(`Plate #${this.id}, x: ${event.detail.x}`);
 
-                    console.log(event.detail.y);
+                    console.log(`Plate #${this.id}, x: ${event.detail.y}`);
 
-                    console.log(event.detail.width);
+                    console.log(`Plate #${this.id}, x: ${event.detail.width}`);
 
-                    console.log(event.detail.height);
+                    console.log(`Plate #${this.id}, x: ${event.detail.height}`);
 
                 }
 

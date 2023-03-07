@@ -111,10 +111,10 @@ class Plate {
             },
 
             crop: (event) => {
-                console.log(event.detail.x);
-                console.log(event.detail.y);
-                console.log(event.detail.width);
-                console.log(event.detail.height);
+                console.log(`Plate #${this.id}, x: ${event.detail.x}`);
+                console.log(`Plate #${this.id}, x: ${event.detail.y}`);
+                console.log(`Plate #${this.id}, x: ${event.detail.width}`);
+                console.log(`Plate #${this.id}, x: ${event.detail.height}`);
             }
         });
     }

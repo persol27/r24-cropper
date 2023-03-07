@@ -44,6 +44,8 @@ class CropperStage extends Stage {
             alert(`Sorry, limit: ${this.platesMax}`);
             return;
         }
+        // First check
+
 
         let scaled = false;
 
@@ -54,6 +56,10 @@ class CropperStage extends Stage {
         background.init(cropperWidth, this.image, scaled);
         
         this.backgrounds.push(background);
+
+        if (this.backgrounds.length == 1) {
+            $('.plate-track').height( $('.cropper__background').height() );
+        }
     }
 
     removeBackgroundLast() {
